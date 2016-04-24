@@ -62,11 +62,12 @@ int      head  = 0, tail = -10; // Index of first 'on' and 'off' pixels
 uint32_t color = 0xFF0000;      // 'On' color (starts red)
 //unsigned int *led_nb = (unsigned int*)malloc(NUMPIXELS * sizeof(unsigned int));
 //bool *seq = (bool*)malloc(NUMPIXELS * sizeof(bool));
-
+unsigned int pos;
 void loop() {
   // read the pushbutton input pin:
   buttonState = digitalRead(buttonPinB);
   strip.setBrightness(8);
+  
   // compare the buttonState to its previous state
   if (buttonState != lastButtonState) {
     // if the state has changed, increment the counter
@@ -76,11 +77,9 @@ void loop() {
       buttonPushCounter++;
 
       //increment();
-      Serial.println(buttonState);
       Serial.print("number of button pushes:  ");
       Serial.println(buttonPushCounter);
-      K2000(buttonPushCounter);
-
+      pos=K2000(buttonPushCounter);
    
       //all_pixels_off();
       //onestep(buttonPushCounter);
@@ -109,7 +108,6 @@ void loop() {
     }
     else {
       //if (lastButtonState != HIGH) 
-      Serial.println(lastButtonState);
       // if the current state is LOW then the button
       // wend from on to off:
        Serial.println("off");
@@ -138,13 +136,14 @@ void all_pixels_on()
 }
 /**********************************/
 /* One pixel deplacement, K2000 style */
-void K2000(int index)
+unsigned int current_position;
+unsigned int K2000(unsigned int index)
 {
-  int index_modulo = index % NUMPIXELS;
-  Serial.println(index_modulo);
+  unsigned int index_modulo = index % NUMPIXELS;
   if(increment_k2000%2==0)
   {
     strip.setPixelColor(index_modulo, color);
+    current_position=index_modulo;
     if(index_modulo!=0)
       strip.setPixelColor(index_modulo - 1, 0);
     else
@@ -156,16 +155,19 @@ void K2000(int index)
   else
   {
     strip.setPixelColor(NUMPIXELS-index_modulo, color);
+    current_position=NUMPIXELS-index_modulo;
   if(index_modulo!=0)
       strip.setPixelColor(NUMPIXELS-index_modulo + 1, 0);
     else
     {
       strip.setPixelColor(1, 0);
       strip.setPixelColor(0, color);
+      current_position=0;
       increment_k2000+=1;
     }
   }
   strip.show(); // Refresh strip
+  return current_position;
 }
 /**********************************/
 /* One pixel deplacement          */
