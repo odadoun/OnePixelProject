@@ -59,14 +59,14 @@ void setup() {
 // Runs 10 LEDs at a time along strip, cycling through red, green and blue.
 // This requires about 200 mA for all the 'on' pixels + 1 mA per 'off' pixel.
 int      head  = 0, tail = -10; // Index of first 'on' and 'off' pixels
-uint32_t color = 0xFF00FF;      // 'On' color (starts red)
-unsigned int *led_nb = (unsigned int*)malloc(NUMPIXELS * sizeof(unsigned int));
-bool *seq = (bool*)malloc(NUMPIXELS * sizeof(bool));
+uint32_t color = 0xFF0000;      // 'On' color (starts red)
+//unsigned int *led_nb = (unsigned int*)malloc(NUMPIXELS * sizeof(unsigned int));
+//bool *seq = (bool*)malloc(NUMPIXELS * sizeof(bool));
 
 void loop() {
   // read the pushbutton input pin:
   buttonState = digitalRead(buttonPinB);
-
+  strip.setBrightness(8);
   // compare the buttonState to its previous state
   if (buttonState != lastButtonState) {
     // if the state has changed, increment the counter
@@ -74,23 +74,20 @@ void loop() {
       // if the current state is HIGH then the button
       // wend from off to on:
       buttonPushCounter++;
-      //for(int i=0;i<2000;i++)
-      //{
-        K2000(buttonPushCounter);
-      //  delay(20); 
-      //}
-      //onestep(buttonPushCounter);
+
       //increment();
       Serial.println(buttonState);
       Serial.print("number of button pushes:  ");
       Serial.println(buttonPushCounter);
+      K2000(buttonPushCounter);
 
+   
+      //all_pixels_off();
+      //onestep(buttonPushCounter);
       /* From 1 to 63 */  
-      led_nb = fill_led_number();
-      
+      //led_nb = fill_led_number();
       /*LED sequence*/    
       //seq=fill_led_sequence();
-
       
      /* 
       for(int i=0;i<NUMPIXELS;i++)
@@ -109,10 +106,10 @@ void loop() {
       }
      strip.show();
      */
-     // open_sequence();
-     
     }
     else {
+      //if (lastButtonState != HIGH) 
+      Serial.println(lastButtonState);
       // if the current state is LOW then the button
       // wend from on to off:
        Serial.println("off");
@@ -124,11 +121,27 @@ void loop() {
   lastButtonState = buttonState;
 }
 /**********************************/
-/* LED deplacement like K2000 */
+/* All pixels switch OFF          */
+void all_pixels_off()
+{
+  for(int i=0;i<NUMPIXELS;i++)
+    strip.setPixelColor(i, 0);
+  strip.show(); 
+}
+/**********************************/
+/*      All pixels switch ON      */
+void all_pixels_on()
+{
+  for(int i=0;i<NUMPIXELS;i++)
+    strip.setPixelColor(i, color);
+  strip.show();
+}
+/**********************************/
+/* One pixel deplacement, K2000 style */
 void K2000(int index)
 {
   int index_modulo = index % NUMPIXELS;
-   Serial.println(index_modulo);
+  Serial.println(index_modulo);
   if(increment_k2000%2==0)
   {
     strip.setPixelColor(index_modulo, color);
@@ -138,8 +151,7 @@ void K2000(int index)
     {
       strip.setPixelColor(0, 0); // boudary problem
       increment_k2000+=1;
-    }
-   
+    }  
   }
   else
   {
@@ -148,31 +160,16 @@ void K2000(int index)
       strip.setPixelColor(NUMPIXELS-index_modulo + 1, 0);
     else
     {
-      //strip.setPixelColor(NUMPIXELS-1, 0);
+      strip.setPixelColor(1, 0);
+      strip.setPixelColor(0, color);
       increment_k2000+=1;
     }
-    Serial.print("AL 2");
   }
   strip.show(); // Refresh strip
-
 }
-
-void increment() {
-  strip.setPixelColor(head, color); // 'On' pixel at head
-  strip.setPixelColor(tail, 0);     // 'Off' pixel at tail 
-  strip.show();                     // Refresh strip
-  //  delay(20);                        // Pause 20 milliseconds (~50 FPS)
-
-  if (++head >= NUMPIXELS) {        // Increment head index.  Off end of strip?
-    head = 0;                       //  Yes, reset head index to start
-    if ((color >>= 8) == 0)         //  Next color (R->G->B) ... past blue now?
-      color = 0xFF0000;             //   Yes, reset to red
-  }
-  if (++tail >= NUMPIXELS) tail = 0; // Increment, reset tail index
-}
-
 /**********************************/
-/* one pixel deplacement */ 
+/* One pixel deplacement          */
+/* (always in the same direction) */ 
 void onestep(int index)
 {
   int index_modulo = index % NUMPIXELS;
@@ -186,7 +183,7 @@ void onestep(int index)
   Serial.println(index_modulo);
 }
 /**********************************/
-/* FILL LED number from 0 up to 63*/
+/*  LED number from 0 up to   63 */
 unsigned int* fill_led_number()
 {
   //unsigned int *all_led = NULL;
