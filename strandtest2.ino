@@ -16,7 +16,7 @@ int buttonPushCounter = 0;
 int buttonState = 0;         
 int lastButtonState = 0;    
 int increment_k2000 = 0;
-
+String *line=(String*)malloc(4 * sizeof(String));
 void setup() {
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
   clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
@@ -35,7 +35,8 @@ void setup() {
   digitalWrite(sdPin, HIGH);
   //initialize serial communication:
   Serial.begin (9600);
- 
+
+  ReadIt();
 }
 
 uint32_t color = 0xFF0000;      // 'On' color (starts red)
@@ -59,14 +60,17 @@ void loop() {
       Serial.print("number of button pushes:  ");
       Serial.println(buttonPushCounter);
       //pos=K2000(buttonPushCounter);
-       ReadIt();
+     
       //all_pixels_off();
       //onestep(buttonPushCounter);
       /* From 1 to 63 */  
       //led_nb = fill_led_number();
       /*LED sequence*/    
       //seq=fill_led_sequence();
-      
+
+
+       Serial.println(line[buttonPushCounter%4]);
+ 
      /* 
       for(int i=0;i<NUMPIXELS;i++)
       {
@@ -197,33 +201,22 @@ void ReadIt()
 {
   if (!SD.begin(4)) {
     Serial.println("initialization failed!");
-    return;
+    return ;
   }
   File myFile = SD.open("test.txt");
-  String line;
+  
   int n=0;
+  
   if (myFile) {
     Serial.println("test.txt:");
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
-      line = myFile.readStringUntil('\n');
-      Serial.println(line);
-      for(unsigned int i=0;i<line.length()-1;i++)
-      {
-        strip.setPixelColor(i,line[i]);
-        Serial.println(i);
-        Serial.println(line[i]);
-      }
-      
-      delay(50);
+      line[n] = myFile.readStringUntil('\n');
       n++;
     }
-    // close the file:
-    myFile.close();
+    myFile.close(); // close the file:
  }
-  else {
-    // if the file didn't open, print an error:
+  else 
     Serial.println("error opening test.txt");
-  }
 }
 
