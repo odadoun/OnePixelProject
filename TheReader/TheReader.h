@@ -21,6 +21,8 @@ class TheReader {
     ~TheReader(void);
     
     void fill_sequence_mem();
+    
+    void fill_sequence_online(int increm,String &led_list);
 
     void SetBitsLineSequence(int i,char val);
     char GetBitsLineSequence(int i); 

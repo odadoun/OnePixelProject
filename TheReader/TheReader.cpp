@@ -23,7 +23,7 @@ TheReader::TheReader(String file_name):itsFileName(file_name),total_bytes(0),nb_
   {
     Serial.println("Initialization failed!");
    } 
-    fill_sequence_mem();
+     myFile=SD.open(itsFileName,FILE_READ);
 }
  
 TheReader::~TheReader(void)
@@ -49,8 +49,7 @@ void TheReader::fill_sequence_mem()
 {             
         int i=0;
         String temp="";   
-       
-	      myFile=SD.open(itsFileName,FILE_READ);
+         
         /* Init first byte reallocation will be needed ...*/   
         itsLines = (char*)malloc(8*sizeof(char));
 
@@ -77,7 +76,7 @@ void TheReader::fill_sequence_mem()
                  {  
                     temp="";
                     i=0;  
-		                nb_lines++; 
+                    nb_lines++; 
                     itsLines = (char*)realloc(itsLines,nb_lines*8*(sizeof(char)));
                   }
               }
@@ -90,8 +89,35 @@ void TheReader::fill_sequence_mem()
       } 
 
      if(total_bytes    != nb_lines * BASE_8 ) 
-	  Serial.println("Oups !!! this should not happen ... total_bytes != nb_lines * BASE_8 something very very wrong !!!");	
+    Serial.println("Oups !!! this should not happen ... total_bytes != nb_lines * BASE_8 something very very wrong !!!"); 
 }
+
+void  TheReader::fill_sequence_online(int increm,String &led_list)
+{
+      int i=0;
+      String temp="";    
+  
+      if(myFile)
+      {
+        int line_pos=increm*(NUMPIXELS+1);//+1 for \n caractere not seen;
+        myFile.seek(line_pos);
+        led_list="";
+        while(myFile.available() && i<NUMPIXELS)
+     {
+        char c = myFile.read();    
+        temp+=c; 
+        i++; 
+     } 
+     led_list=temp;
+     temp="";  
+     i=0;
+    }
+    else 
+    {
+     Serial.print("Error opening : ");
+     Serial.println(itsFileName);
+      } 
+ }        
 
 String TheReader::eight_bits_sequence(int nb_bytes)
 { 
