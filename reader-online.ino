@@ -19,10 +19,10 @@ int buttonState = 0;
 int lastButtonState = 0;    
 
 
-TheReader reader("PHEROM~1.TXT");
+TheReader reader("test1.txt");//""PHEROM~1.TXT");
 int n=reader.GetNbLines();
 int tot_bytes=reader.GetTotalBytes();
-
+bool ended_boolean="false";
 
 void setup() {
   
@@ -48,6 +48,8 @@ void setup() {
   }
   /* A K2000 STYLE FOR INIT */
   Serial.println("Initialisation stage ...");
+
+  
 }
 
 uint32_t color = 0xFF0000;    
@@ -56,24 +58,25 @@ void loop() {
   buttonState = digitalRead(buttonPinB);
   strip.setBrightness(10);
   String list=""; 
-buttonState = HIGH;
-  if (buttonState == lastButtonState) {
+
+  if (buttonState != lastButtonState) {
     // if the state has changed, increment the counter
     if (buttonState == HIGH) {
+      if(ended_boolean == true) {Serial.println("FIN");}
       // if the current state is HIGH then the button
       // wend from off to on:
       //increment();
       Serial.print("number of button pushes:  ");
       Serial.println(buttonPushCounter);
  
-       reader.fill_sequence_online(buttonPushCounter,list);
+       ended_boolean = reader.fill_sequence_online(buttonPushCounter,list);
+        Serial.println(ended_boolean);
        Serial.println(list);
        for(int i=0;i<NUMPIXELS;i++) 
        {
         if(list[i] == '1')
         strip.setPixelColor(i, color); // 'On' pixel at head
         else strip.setPixelColor(i, 0);  
-        
        }
        strip.show();
        buttonPushCounter++;
