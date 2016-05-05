@@ -22,21 +22,22 @@ class TheReader {
     
     void fill_sequence_mem();
     
-    void fill_sequence_online(int increm,String &led_list);
+    bool fill_sequence_online(int increm,String &led_list);
 
     void SetBitsLineSequence(int i,char val);
     char GetBitsLineSequence(int i); 
     
     int GetNbLines() {return nb_lines;}
-    int GetTotalBytes() {return total_bytes;}
+    unsigned int GetTotalBytes() {return total_bytes;}
 
     String eight_bits_sequence(int nb_bytes); 
+   
   
   private:
     File myFile;
     String itsFileName; 
     char* itsLines;
-    int total_bytes;
+    unsigned int total_bytes;
     int nb_lines;
 };
 

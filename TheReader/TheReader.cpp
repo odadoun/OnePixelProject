@@ -49,7 +49,7 @@ void TheReader::fill_sequence_mem()
 {             
         int i=0;
         String temp="";   
-         
+      
         /* Init first byte reallocation will be needed ...*/   
         itsLines = (char*)malloc(8*sizeof(char));
 
@@ -92,11 +92,11 @@ void TheReader::fill_sequence_mem()
     Serial.println("Oups !!! this should not happen ... total_bytes != nb_lines * BASE_8 something very very wrong !!!"); 
 }
 
-void  TheReader::fill_sequence_online(int increm,String &led_list)
+boolean TheReader::fill_sequence_online(int increm,String &led_list)
 {
       int i=0;
       String temp="";    
-  
+      bool value=false;
       if(myFile)
       {
         int line_pos=increm*(NUMPIXELS+1);//+1 for \n caractere not seen;
@@ -106,17 +106,29 @@ void  TheReader::fill_sequence_online(int increm,String &led_list)
      {
         char c = myFile.read();    
         temp+=c; 
+        if(i%8==0) total_bytes++;
         i++; 
      } 
      led_list=temp;
      temp="";  
      i=0;
-    }
+     nb_lines++;
+      
+     if(total_bytes*8 + nb_lines>= myFile.size())
+     {
+      Serial.println("End of file was reached ...");
+      myFile.close();
+      nb_lines=0;
+      total_bytes=0;
+      value=true;
+     }
+    } 
     else 
     {
      Serial.print("Error opening : ");
      Serial.println(itsFileName);
-      } 
+     } 
+     return value;
  }        
 
 String TheReader::eight_bits_sequence(int nb_bytes)
@@ -129,5 +141,5 @@ String TheReader::eight_bits_sequence(int nb_bytes)
    }
    return temp;
 }
-        
+
 
