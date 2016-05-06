@@ -1,5 +1,5 @@
 /* The Reader class 
- * O. Dadoun May 2016 
+ * O. Dadoun & N. Darrot May 2016 
  * odadoun@gmail.com 
  * Loads an ascii file (located on arduino SD card) onto SDRAM 
  * file (with nb_lines) format is
@@ -22,23 +22,23 @@ class TheReader {
     
     void fill_sequence_mem();
     
-    bool fill_sequence_online(int increm,String &led_list);
+    bool fill_sequence_online(long int increm,String &led_list);
 
-    void SetBitsLineSequence(int i,char val);
-    char GetBitsLineSequence(int i); 
+    void SetBitsLineSequence(long int i,char val);
+    char GetBitsLineSequence(long int i); 
     
-    int GetNbLines() {return nb_lines;}
-    unsigned int GetTotalBytes() {return total_bytes;}
+    long int GetNbLines() {return nb_lines;}
+    long int GetTotalBytes() {return total_bytes;}
 
-    String eight_bits_sequence(int nb_bytes); 
+    String eight_bits_sequence(long int nb_bytes); 
    
   
   private:
     File myFile;
     String itsFileName; 
     char* itsLines;
-    unsigned int total_bytes;
-    int nb_lines;
+    long int total_bytes;
+    long int nb_lines;
 };
 
 #endif

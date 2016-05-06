@@ -1,5 +1,5 @@
 /* The Reader class
- * O. Dadoun May 2016
+ * O. Dadoun & N. Darrot May 2016
  * odadoun@gmail.com
  * Loads an ascii file (located on arduino SD card) onto SDRAM
  * file (with nb_lines) format is
@@ -35,19 +35,19 @@ TheReader::~TheReader(void)
 }
 
 
-void TheReader::SetBitsLineSequence(int i,char val)
+void TheReader::SetBitsLineSequence(long int i,char val)
 {
   sprintf(itsLines+i,"%c",val);
  }
  
-char TheReader::GetBitsLineSequence(int i)
+char TheReader::GetBitsLineSequence(long int i)
 {
   return itsLines[i];
 }
 
 void TheReader::fill_sequence_mem()
 {             
-        int i=0;
+        long int i=0;
         String temp="";   
       
         /* Init first byte reallocation will be needed ...*/   
@@ -92,14 +92,14 @@ void TheReader::fill_sequence_mem()
     Serial.println("Oups !!! this should not happen ... total_bytes != nb_lines * BASE_8 something very very wrong !!!"); 
 }
 
-boolean TheReader::fill_sequence_online(int increm,String &led_list)
+boolean TheReader::fill_sequence_online(long int increm,String &led_list)
 {
-      int i=0;
+      long int i=0;
       String temp="";    
       bool value=false;
       if(myFile)
       {
-        int line_pos=increm*(NUMPIXELS+1);//+1 for \n caractere not seen;
+        long int line_pos=increm*(NUMPIXELS+1);//+1 for \n caractere not seen;
         myFile.seek(line_pos);
         led_list="";
         while(myFile.available() && i<NUMPIXELS)
@@ -131,7 +131,7 @@ boolean TheReader::fill_sequence_online(int increm,String &led_list)
      return value;
  }        
 
-String TheReader::eight_bits_sequence(int nb_bytes)
+String TheReader::eight_bits_sequence(long int nb_bytes)
 { 
   unsigned char c = GetBitsLineSequence(nb_bytes);
   String temp="";
