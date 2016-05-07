@@ -62,7 +62,13 @@ void loop() {
   if (buttonState != lastButtonState) {
     // if the state has changed, increment the counter
     if (buttonState == HIGH) {
-      if(ended_boolean == true) {Serial.println("FIN");}
+      if(ended_boolean == true) 
+	{
+	File fi=reader.GetFile(); 
+	Serial.println("END File, close it and reopen it ...");
+  	fi.close();
+	fi=SD.open(itsFileName,FILE_READ);
+	}
       // if the current state is HIGH then the button
       // wend from off to on:
       //increment();

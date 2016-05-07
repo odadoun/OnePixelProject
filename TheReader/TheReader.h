@@ -30,8 +30,9 @@ class TheReader {
     long int GetNbLines() {return nb_lines;}
     long int GetTotalBytes() {return total_bytes;}
 
+    File GetFile() {return myFile;}
     String eight_bits_sequence(long int nb_bytes); 
-   
+  	 
   
   private:
     File myFile;
