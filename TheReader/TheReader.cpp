@@ -117,7 +117,6 @@ boolean TheReader::fill_sequence_online(long int increm,String &led_list)
      if(total_bytes*8 + nb_lines>= myFile.size())
      {
       Serial.println("End of file was reached ...");
-      myFile.close();
       nb_lines=0;
       total_bytes=0;
       value=true;

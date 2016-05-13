@@ -19,10 +19,8 @@ int buttonState = 0;
 int lastButtonState = 0;    
 
 
-TheReader reader("test1.txt");//""PHEROM~1.TXT");
-int n=reader.GetNbLines();
-int tot_bytes=reader.GetTotalBytes();
-bool ended_boolean="false";
+TheReader reader("IBIS/test2.txt");//""PHEROM~1.TXT");
+bool ended_boolean=false;
 
 void setup() {
   
@@ -62,7 +60,11 @@ void loop() {
   if (buttonState != lastButtonState) {
     // if the state has changed, increment the counter
     if (buttonState == HIGH) {
-      if(ended_boolean == true) {Serial.println("FIN");}
+      if(ended_boolean == true) 
+	{
+	Serial.println("END File, restart at the beginning");
+  buttonPushCounter=0;
+	}
       // if the current state is HIGH then the button
       // wend from off to on:
       //increment();
@@ -70,7 +72,7 @@ void loop() {
       Serial.println(buttonPushCounter);
  
        ended_boolean = reader.fill_sequence_online(buttonPushCounter,list);
-        Serial.println(ended_boolean);
+       Serial.println(ended_boolean);
        Serial.println(list);
        for(int i=0;i<NUMPIXELS;i++) 
        {
