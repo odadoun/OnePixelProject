@@ -49,6 +49,7 @@ long EEPROMReadlong(long address)
 long filePosition = EEPROMReadlong(0);
 
 TheReaderUniverse reader_universe;
+long int lastest_line_bytes[2];
 
 void setup() {
 
@@ -70,8 +71,15 @@ void setup() {
   Serial.println("Blue!");
 
   reader_universe = TheReaderUniverse("ONEPIXEL.TXT");
-  reader_universe.SetLinesRead(181);
-  reader_universe.SetBytesRead(3982);
+  
+  Serial.println(EEPROMReadlong(0));
+  Serial.println(EEPROMReadlong(4));
+  
+  lastest_line_bytes[0]=EEPROMReadlong(0);
+  lastest_line_bytes[1]=EEPROMReadlong(4);
+   
+  reader_universe.SetLinesRead(lastest_line_bytes[0]);
+  reader_universe.SetBytesRead(lastest_line_bytes[1]);
 }
 
 void loop() {
@@ -93,6 +101,7 @@ void loop() {
 
   //delay(50);
 
+   
   /*
     int red= random(255);
     int blue=random(255);
@@ -106,20 +115,33 @@ void loop() {
     lcd.setCursor(0,2);
     lcd.print(filePosition);
   */
-  /*
+  
     for (boucle=0; boucle<90; boucle++) {
      watchdogValue=analogRead(analogInPin);
        // print the results to the serial monitor:
 
     if (watchdogValue < 800) {
-      EEPROMWritelong(address, filePosition);
+     lastest_line_bytes[0]=reader_universe.GetLinesRead();
+     lastest_line_bytes[1]=reader_universe.GetBytesRead();  
+ 
+      long address = 0;
+      EEPROMWritelong(address, lastest_line_bytes[0]);
+      address+=4;
+      EEPROMWritelong(address,lastest_line_bytes[1]);
       lcd.setCursor(0,0);
-     lcd.print("saved");
+      lcd.print("Lines :");
+      lcd.println(lastest_line_bytes[0]);
+      lcd.setCursor(0,1);
+      lcd.print("Bytes :");
+      lcd.println(lastest_line_bytes[1]);
+      lcd.setCursor(5,5);
+      lcd.println("saved");
+      
     }
 
     // delay(10);
     }
-  */
+ 
 }
 
 
