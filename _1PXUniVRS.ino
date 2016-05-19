@@ -16,7 +16,6 @@
 #include <SPI.h>
 #include <SD.h>
 
-
 #define NUMPIXELS 10 // Number of Pixies in the strip
 #define PIXIEPIN  6 // Pin number for SoftwareSerial output
 Adafruit_LiquidCrystal lcd(0);
@@ -32,16 +31,15 @@ int watchdogValue = 0;        // value read from the pot
 int i;
 int boucle;
 int address = 0;
-//This function will return a 4 byte (32bit) long from the eeprom
-//at the specified address to address + 3.
+// This function will return a 4 byte (32bit) long from the eeprom
+// at the specified address to address + 3.
 long EEPROMReadlong(long address)
 {
   //Read the 4 bytes from the eeprom memory.
-  long four = EEPROM.read(address);
+  long four  = EEPROM.read(address);
   long three = EEPROM.read(address + 1);
-  long two = EEPROM.read(address + 2);
-  long one = EEPROM.read(address + 3);
-
+  long two   = EEPROM.read(address + 2);
+  long one   = EEPROM.read(address + 3);
   //Return the recomposed long by using bitshift.
   return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
@@ -52,7 +50,6 @@ TheReaderUniverse reader_universe;
 long int lastest_line_bytes[2];
 
 void setup() {
-
   Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -61,35 +58,33 @@ void setup() {
   // set up the LCD's number of rows and columns:
   lcd.begin(20, 4);
   // Print a message to the LCD.
-  lcd.print("saved cursor pos");
-  lcd.setCursor(0, 1);
-  lcd.print(filePosition);
+  // lcd.print("saved cursor pos");
+  // lcd.setCursor(0, 1);
+  // lcd.print(filePosition);
 
   pixieSerial.begin(115200); // Pixie REQUIRES this baud rate
   // Serial1.begin(115200);  // <- Alt. if using hardware serial port
   strip.setBrightness(255);  // Adjust as necessary to avoid blinding
   Serial.println("Blue!");
 
-  reader_universe = TheReaderUniverse("ONEPIXEL.TXT");
+  /* loaded constellations names and position */
+  reader_universe.load_constellations_abacus();
   
   Serial.println(EEPROMReadlong(0));
   Serial.println(EEPROMReadlong(4));
-  
-  lastest_line_bytes[0]=EEPROMReadlong(0);
-  lastest_line_bytes[1]=EEPROMReadlong(4);
-   
+
+  lastest_line_bytes[0] = EEPROMReadlong(0);
+  lastest_line_bytes[1] = EEPROMReadlong(4);
+
   reader_universe.SetLinesRead(lastest_line_bytes[0]);
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
 }
 
 void loop() {
 
-  long int xy_RGB[5];
+  char xy_RGB[5][64];
 
-
-  bool ended_boolean;
-  ended_boolean = reader_universe.fill_sequence_online(xy_RGB);
-
+  reader_universe.fill_sequence_online(xy_RGB);
 
   Serial.print(reader_universe.GetLinesRead());
   Serial.print(" ");
@@ -99,51 +94,39 @@ void loop() {
   Serial.print(xy_RGB[2]); Serial.print(" "); Serial.print(xy_RGB[3]); Serial.print(" ");
   Serial.print(xy_RGB[4]); Serial.println();
 
-  //delay(50);
-
-   
-  /*
-    int red= random(255);
-    int blue=random(255);
-    int green=random(255);
-    int light=random(255);
-    strip.setBrightness(200);
-    for(i=0; i< NUMPIXELS; i++)
-      strip.setPixelColor(i, int (red/5), int (blue/5), int (green/5));
-    strip.show();
-    filePosition=filePosition+1;
-    lcd.setCursor(0,2);
-    lcd.print(filePosition);
-  */
+  Serial.println("It is the constellation named ");
+  //Serial.println(reader_universe.return_constellation(13161,665));
+  Serial.println(reader_universe.return_constellation(atol(xy_RGB[0]),atol(xy_RGB[1])));
   
-    for (boucle=0; boucle<90; boucle++) {
-     watchdogValue=analogRead(analogInPin);
-       // print the results to the serial monitor:
+  strip.setBrightness(30);
+  for (i = 0; i < NUMPIXELS; i++)
+    strip.setPixelColor(i, atoi(xy_RGB[2]), atoi(xy_RGB[3]), atoi(xy_RGB[4]));
+  strip.show();
+
+
+  for (boucle = 0; boucle < 90; boucle++) {
+    watchdogValue = analogRead(analogInPin);
+    // print the results to the serial monitor:
+  lcd.setCursor(0, 0);
+  lcd.print("Lines :");
+  lcd.println(reader_universe.GetLinesRead());
+  lcd.setCursor(0, 1);
+  lcd.print("Bytes :");
+  lcd.println(reader_universe.GetBytesRead());
+  lcd.setCursor(5, 5);
+  lcd.println("saved");
 
     if (watchdogValue < 800) {
-     lastest_line_bytes[0]=reader_universe.GetLinesRead();
-     lastest_line_bytes[1]=reader_universe.GetBytesRead();  
- 
+      lastest_line_bytes[0] = reader_universe.GetLinesRead();
+      lastest_line_bytes[1] = reader_universe.GetBytesRead();
       long address = 0;
       EEPROMWritelong(address, lastest_line_bytes[0]);
-      address+=4;
-      EEPROMWritelong(address,lastest_line_bytes[1]);
-      lcd.setCursor(0,0);
-      lcd.print("Lines :");
-      lcd.println(lastest_line_bytes[0]);
-      lcd.setCursor(0,1);
-      lcd.print("Bytes :");
-      lcd.println(lastest_line_bytes[1]);
-      lcd.setCursor(5,5);
-      lcd.println("saved");
-      
+      address += 4;
+      EEPROMWritelong(address, lastest_line_bytes[1]);
     }
-
-    // delay(10);
-    }
- 
+  }
+  delay(50);
 }
-
 
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
@@ -157,7 +140,6 @@ void rainbowCycle(uint8_t wait) {
     delay(wait);
   }
 }
-
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
