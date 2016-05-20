@@ -1,33 +1,18 @@
 /* The Reader for Universe scan
    O. Dadoun & N. Darrot May 2016
    odadoun@gmail.com
-   Loads an ascii file (located on arduino SD card) onto SDRAM
+   Read an ascii file (located on arduino SD card) onto SDRAM
    file (with nb_lines) format is
-   pixel_i,pixel_j,Red,Green,Blue ... RGB between 0 up to 255
+   pixel_i,pixel_j,Red,Green,Blue ... RGB between 0 up to 255 
+   180 Mega lines !!!
+   Load from a file located on arduino SD card the constellation 
+   name and positions into memory 75 lignes 
 */
 #include "TheReaderUniverse.h"
 
 TheReaderUniverse::TheReaderUniverse():itsFileName("ONEPIXEL.TXT"), nb_lines_read(0), nb_bytes_read(0)
 {
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-  if (!SD.begin(4))
-  {
-    Serial.println("Initialization failed!");
-    return;
-  }
-  Serial.println("In the Reader Constructor");
-  
-    if (SD.exists(itsFileName))
-  {
-    Serial.print(itsFileName);
-    Serial.println("file open");
-    myFile = SD.open(itsFileName, FILE_READ);
-    Serial.println(myFile);
-  }
-  else Serial.println("File does not exist ... '(");
+ 
 }
 
 TheReaderUniverse::~TheReaderUniverse()
@@ -107,7 +92,8 @@ void TheReaderUniverse::load_constellations_abacus()
         sprintf(char_temp, "%s", temp.c_str());
         
         char abac[5][64];  
-        line_extracter(char_temp,abac);  
+        line_extracter(char_temp,abac);
+          
         sprintf(abacus[nb_lines].name_abac, "%s", abac[0]);
         abacus[nb_lines].begin_x = atol(abac[1]);
         abacus[nb_lines].begin_y = atol(abac[2]);
@@ -124,19 +110,22 @@ void TheReaderUniverse::load_constellations_abacus()
   else Serial.print("Error opening : ");
 }
 
-char *TheReaderUniverse::return_constellation(long int pix_x,long int pix_y)
+String TheReaderUniverse::return_constellation(long unsigned int pix_x,long unsigned int pix_y)
 {
+  String name_value;
   char temp[64];
-  sprintf(temp,"%s","Nothing interesting here...");
+  sprintf(temp,"%s","Nothing interesting here ...");
+ 
   for(int i=0;i<nb_lines_abaccus;i++)  
   {
     if( pix_x>=abacus[i].begin_x && pix_x<=abacus[i].end_x 
     &&  pix_y>=abacus[i].begin_y && pix_y<=abacus[i].end_y)
     {
-      return abacus[i].name_abac;
+      name_value=String(abacus[i].name_abac);
     }
-   else return temp;
+   else  name_value=String(temp);
   }
+  return name_value;
 }
 
 

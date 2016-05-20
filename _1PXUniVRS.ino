@@ -16,6 +16,7 @@
 #include <SPI.h>
 #include <SD.h>
 
+
 #define NUMPIXELS 10 // Number of Pixies in the strip
 #define PIXIEPIN  6 // Pin number for SoftwareSerial output
 Adafruit_LiquidCrystal lcd(0);
@@ -50,10 +51,27 @@ TheReaderUniverse reader_universe;
 long int lastest_line_bytes[2];
 
 void setup() {
-  Serial.begin(9600);
+  /*  */ 
+ Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
+  if (!SD.begin(4))
+  {
+    Serial.println("Initialization failed!");
+    return;
+  }
+  
+    if (SD.exists("ONEPIXEL.TXT"))
+  {
+    Serial.print("ONEPIXEL.TXT");
+    Serial.println("file open");
+    reader_universe.myFile = SD.open("ONEPIXEL.TXT", FILE_READ);
+    Serial.println(reader_universe.myFile);
+  }
+  else Serial.println("File does not exist ... '(");
+/* */
+  
 
   // set up the LCD's number of rows and columns:
   lcd.begin(20, 4);
@@ -68,16 +86,18 @@ void setup() {
   Serial.println("Blue!");
 
   /* loaded constellations names and position */
-  reader_universe.load_constellations_abacus();
+ // reader_universe.load_constellations_abacus();
   
   Serial.println(EEPROMReadlong(0));
   Serial.println(EEPROMReadlong(4));
 
   lastest_line_bytes[0] = EEPROMReadlong(0);
   lastest_line_bytes[1] = EEPROMReadlong(4);
-
   reader_universe.SetLinesRead(lastest_line_bytes[0]);
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
+
+  reader_universe.load_constellations_abacus();
+
 }
 
 void loop() {
@@ -105,17 +125,8 @@ void loop() {
 
 
   for (boucle = 0; boucle < 90; boucle++) {
-    watchdogValue = analogRead(analogInPin);
+  watchdogValue = analogRead(analogInPin);
     // print the results to the serial monitor:
-  lcd.setCursor(0, 0);
-  lcd.print("Lines :");
-  lcd.println(reader_universe.GetLinesRead());
-  lcd.setCursor(0, 1);
-  lcd.print("Bytes :");
-  lcd.println(reader_universe.GetBytesRead());
-  lcd.setCursor(5, 5);
-  lcd.println("saved");
-
     if (watchdogValue < 800) {
       lastest_line_bytes[0] = reader_universe.GetLinesRead();
       lastest_line_bytes[1] = reader_universe.GetBytesRead();
@@ -125,7 +136,17 @@ void loop() {
       EEPROMWritelong(address, lastest_line_bytes[1]);
     }
   }
-  delay(50);
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Lines :");
+  lcd.println(String(reader_universe.GetLinesRead()));
+  lcd.setCursor(0, 1);
+  lcd.print("Bytes :");
+  lcd.println(String(reader_universe.GetBytesRead()));
+  lcd.setCursor(5, 5);
+  lcd.println("saved");
+  
+  delay(500);
 }
 
 // Slightly different, this makes the rainbow equally distributed throughout
