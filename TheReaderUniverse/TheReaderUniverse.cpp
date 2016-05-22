@@ -28,6 +28,9 @@ void TheReaderUniverse::fill_sequence_online(char (&pix_rgb)[5][64])
 
   if (myFile)
   {
+    Serial.println("In fill_sequence_online");
+    Serial.println(nb_bytes_read);
+    Serial.println(nb_lines_read);
     myFile.seek(nb_bytes_read);
     String led_list = "";
     while (myFile.available() && new_line == false)
@@ -72,7 +75,7 @@ void TheReaderUniverse::fill_sequence_online(char (&pix_rgb)[5][64])
 void TheReaderUniverse::load_constellations_abacus()
 {
   String temp = "";
-  File myFile = SD.open("CONSTE~1.TXT", FILE_READ);
+  File myFile = SD.open("CONST.TXT", FILE_READ);
   
   /* NAME_CONSTELLATION MIN_X MIN_Y MAX_X MAX_Y */
   int nb_lines = 0;
@@ -115,13 +118,14 @@ String TheReaderUniverse::return_constellation(long unsigned int pix_x,long unsi
   String name_value;
   char temp[64];
   sprintf(temp,"%s","Nothing interesting here ...");
- 
+  
   for(int i=0;i<nb_lines_abaccus;i++)  
   {
     if( pix_x>=abacus[i].begin_x && pix_x<=abacus[i].end_x 
     &&  pix_y>=abacus[i].begin_y && pix_y<=abacus[i].end_y)
     {
       name_value=String(abacus[i].name_abac);
+      break;
     }
    else  name_value=String(temp);
   }

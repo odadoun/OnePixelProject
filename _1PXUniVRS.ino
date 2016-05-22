@@ -29,8 +29,6 @@ Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &pixieSerial);
 const int analogInPin = A2;  // Analog input pin used as a watchdog
 int watchdogValue = 0;        // value read from the pot
 
-int i;
-int boucle;
 int address = 0;
 // This function will return a 4 byte (32bit) long from the eeprom
 // at the specified address to address + 3.
@@ -44,15 +42,14 @@ long EEPROMReadlong(long address)
   //Return the recomposed long by using bitshift.
   return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
-
 long filePosition = EEPROMReadlong(0);
 
 TheReaderUniverse reader_universe;
 long int lastest_line_bytes[2];
 
 void setup() {
-  /*  */ 
- Serial.begin(9600);
+  /*  Begin of testing and opening SD file   */
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -61,8 +58,7 @@ void setup() {
     Serial.println("Initialization failed!");
     return;
   }
-  
-    if (SD.exists("ONEPIXEL.TXT"))
+  if (SD.exists("ONEPIXEL.TXT"))
   {
     Serial.print("ONEPIXEL.TXT");
     Serial.println("file open");
@@ -70,8 +66,7 @@ void setup() {
     Serial.println(reader_universe.myFile);
   }
   else Serial.println("File does not exist ... '(");
-/* */
-  
+  /*  End of testing and opening SD file   */
 
   // set up the LCD's number of rows and columns:
   lcd.begin(20, 4);
@@ -86,8 +81,8 @@ void setup() {
   Serial.println("Blue!");
 
   /* loaded constellations names and position */
- // reader_universe.load_constellations_abacus();
-  
+  // reader_universe.load_constellations_abacus();
+
   Serial.println(EEPROMReadlong(0));
   Serial.println(EEPROMReadlong(4));
 
@@ -97,13 +92,11 @@ void setup() {
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
 
   reader_universe.load_constellations_abacus();
-
 }
 
 void loop() {
 
   char xy_RGB[5][64];
-
   reader_universe.fill_sequence_online(xy_RGB);
 
   Serial.print(reader_universe.GetLinesRead());
@@ -114,66 +107,40 @@ void loop() {
   Serial.print(xy_RGB[2]); Serial.print(" "); Serial.print(xy_RGB[3]); Serial.print(" ");
   Serial.print(xy_RGB[4]); Serial.println();
 
+  unsigned long px=strtoul(xy_RGB[0],NULL,0);
+  unsigned long py=strtoul(xy_RGB[1],NULL,0);
+  Serial.print(px);
   Serial.println("It is the constellation named ");
   //Serial.println(reader_universe.return_constellation(13161,665));
-  Serial.println(reader_universe.return_constellation(atol(xy_RGB[0]),atol(xy_RGB[1])));
-  
+  Serial.println(reader_universe.return_constellation(px,py));
+
   strip.setBrightness(30);
-  for (i = 0; i < NUMPIXELS; i++)
+  for (int i = 0; i < NUMPIXELS; i++)
     strip.setPixelColor(i, atoi(xy_RGB[2]), atoi(xy_RGB[3]), atoi(xy_RGB[4]));
   strip.show();
 
+  lastest_line_bytes[0] = reader_universe.GetLinesRead();
+  lastest_line_bytes[1] = reader_universe.GetBytesRead();
 
-  for (boucle = 0; boucle < 90; boucle++) {
-  watchdogValue = analogRead(analogInPin);
+  for (int boucle = 0; boucle < 90; boucle++) {
+    watchdogValue = analogRead(analogInPin);
     // print the results to the serial monitor:
     if (watchdogValue < 800) {
-      lastest_line_bytes[0] = reader_universe.GetLinesRead();
-      lastest_line_bytes[1] = reader_universe.GetBytesRead();
       long address = 0;
-      EEPROMWritelong(address, lastest_line_bytes[0]);
+      EEPROMWritelong(address,  lastest_line_bytes[0]);
       address += 4;
       EEPROMWritelong(address, lastest_line_bytes[1]);
     }
   }
-  
+
   lcd.setCursor(0, 0);
   lcd.print("Lines :");
-  lcd.println(String(reader_universe.GetLinesRead()));
+  lcd.print(String(lastest_line_bytes[0]));
   lcd.setCursor(0, 1);
   lcd.print("Bytes :");
-  lcd.println(String(reader_universe.GetBytesRead()));
-  lcd.setCursor(5, 5);
-  lcd.println("saved");
-  
-  delay(500);
-}
+  lcd.print(String(lastest_line_bytes[1]));
 
-// Slightly different, this makes the rainbow equally distributed throughout
-void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
-
-  for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
-    for (i = 0; i < NUMPIXELS; i++) {
-      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
-    }
-    strip.show();
-    delay(wait);
-  }
-}
-
-// Input a value 0 to 255 to get a color value.
-// The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) {
-  if (WheelPos < 85) {
-    return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
-  } else if (WheelPos < 170) {
-    WheelPos -= 85;
-    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
-  } else {
-    WheelPos -= 170;
-    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
+  delay(1000);
 }
 
 void EEPROMWritelong(int address, long value)
@@ -184,13 +151,14 @@ void EEPROMWritelong(int address, long value)
   byte three = ((value >> 8) & 0xFF);
   byte two = ((value >> 16) & 0xFF);
   byte one = ((value >> 24) & 0xFF);
-
   //Write the 4 bytes into the eeprom memory.
   EEPROM.write(address, four);
   EEPROM.write(address + 1, three);
   EEPROM.write(address + 2, two);
   EEPROM.write(address + 3, one);
 }
+
+
 
 
 

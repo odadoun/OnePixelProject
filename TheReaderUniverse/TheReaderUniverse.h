@@ -34,9 +34,9 @@ class TheReaderUniverse {
     File myFile;
 
     void fill_sequence_online(char (&pix_rgb)[5][64]);
-    
-    long unsigned int GetLinesRead() {return nb_lines_read;}
+
     void SetLinesRead(long unsigned int lines) {nb_lines_read=lines;}
+    long unsigned int GetLinesRead() {return nb_lines_read;}
     
     long unsigned int GetBytesRead() {return nb_bytes_read;}
     void SetBytesRead(long unsigned int bytes) {nb_bytes_read=bytes;}
