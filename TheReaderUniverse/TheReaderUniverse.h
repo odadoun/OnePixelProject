@@ -44,7 +44,10 @@ class TheReaderUniverse {
     void load_constellations_abacus();
     void line_extracter(char* input_string, char (&name_value)[5][64]);
     String return_constellation(long unsigned int pix_x,long unsigned int pix_y);
-      
+
+    float GetLongitude(long unsigned int pix_x);
+    float GetLatitude(long unsigned int pix_y);
+    
   private:
     
     String itsFileName; 

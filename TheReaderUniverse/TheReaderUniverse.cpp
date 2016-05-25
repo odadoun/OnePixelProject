@@ -12,7 +12,7 @@
 
 TheReaderUniverse::TheReaderUniverse():itsFileName("ONEPIXEL.TXT"), nb_lines_read(0), nb_bytes_read(0)
 {
- 
+ ;
 }
 
 TheReaderUniverse::~TheReaderUniverse()
@@ -80,7 +80,7 @@ void TheReaderUniverse::load_constellations_abacus()
   /* NAME_CONSTELLATION MIN_X MIN_Y MAX_X MAX_Y */
   int nb_lines = 0;
   if (myFile) {
-    Serial.println("File opened");
+    Serial.println("Constellation abacus opened");
 
     while (myFile.available()) {
       char c = myFile.read();
@@ -90,8 +90,9 @@ void TheReaderUniverse::load_constellations_abacus()
       }
       else
       {
-        char *char_temp;
-        char_temp = (char*)malloc(temp.length() * sizeof(char));
+        //char *char_temp;
+        //char_temp = (char*)malloc(temp.length() * sizeof(char));
+        char char_temp[128];
         sprintf(char_temp, "%s", temp.c_str());
         
         char abac[5][64];  
@@ -132,6 +133,22 @@ String TheReaderUniverse::return_constellation(long unsigned int pix_x,long unsi
   return name_value;
 }
 
+ 
+float TheReaderUniverse::GetLongitude(long unsigned int pix_x)
+{
+    float longitude=0.; 
+    if(pix_x<=9500) longitude=-(180./9500.)*(pix_x-9500.);
+    else longitude=(180./9499)*(pix_x-9500.);
+    return longitude;
+}
+
+float TheReaderUniverse::GetLatitude(long unsigned int pix_y)
+{
+    float latitude=0.;
+    if(pix_y>=4749) latitude=(90./4750)*(pix_y-4749.);
+    else latitude=(90./4749)*(pix_y-4749.);
+    return latitude;  
+}
 
 void TheReaderUniverse::line_extracter(char* input_string, char (&name_value)[5][64])
 {

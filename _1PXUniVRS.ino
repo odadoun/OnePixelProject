@@ -58,12 +58,12 @@ void setup() {
     Serial.println("Initialization failed!");
     return;
   }
-  if (SD.exists("ONEPIXEL.TXT"))
+  String name_file="ONEPIXEL.TXT";
+  if(SD.exists(name_file))
   {
-    Serial.print("ONEPIXEL.TXT");
-    Serial.println("file open");
-    reader_universe.myFile = SD.open("ONEPIXEL.TXT", FILE_READ);
-    Serial.println(reader_universe.myFile);
+    reader_universe.myFile = SD.open(name_file, FILE_READ);
+    Serial.print(name_file);
+    Serial.println(" : file opened");
   }
   else Serial.println("File does not exist ... '(");
   /*  End of testing and opening SD file   */
@@ -80,9 +80,8 @@ void setup() {
   strip.setBrightness(255);  // Adjust as necessary to avoid blinding
   Serial.println("Blue!");
 
-  /* loaded constellations names and position */
-  // reader_universe.load_constellations_abacus();
-
+ 
+  
   Serial.println(EEPROMReadlong(0));
   Serial.println(EEPROMReadlong(4));
 
@@ -90,7 +89,7 @@ void setup() {
   lastest_line_bytes[1] = EEPROMReadlong(4);
   reader_universe.SetLinesRead(lastest_line_bytes[0]);
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
-
+ /* loaded constellations names and position */
   reader_universe.load_constellations_abacus();
 }
 
@@ -111,8 +110,9 @@ void loop() {
   unsigned long py=strtoul(xy_RGB[1],NULL,0);
   Serial.print(px);
   Serial.println("It is the constellation named ");
-  //Serial.println(reader_universe.return_constellation(13161,665));
   Serial.println(reader_universe.return_constellation(px,py));
+  Serial.println("YEAH");
+
 
   strip.setBrightness(30);
   for (int i = 0; i < NUMPIXELS; i++)
@@ -133,12 +133,23 @@ void loop() {
     }
   }
 
+/* Print stuff on the LCD */
   lcd.setCursor(0, 0);
   lcd.print("Lines :");
   lcd.print(String(lastest_line_bytes[0]));
   lcd.setCursor(0, 1);
   lcd.print("Bytes :");
   lcd.print(String(lastest_line_bytes[1]));
+
+  px=0;
+  py=0;
+  lcd.setCursor(0, 2);
+  lcd.print(reader_universe.GetLongitude(px));
+  lcd.print((char)223);
+  
+  lcd.setCursor(0, 3);
+  lcd.print(reader_universe.GetLatitude(py));
+  lcd.print((char)223);   
 
   delay(1000);
 }
