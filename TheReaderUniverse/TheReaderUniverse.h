@@ -14,17 +14,17 @@
 
 #include <SPI.h>
 #include <SD.h>
-#define nb_lines_abaccus 75
+#define nb_lines_abaccus 88
 
 class TheReaderUniverse {
   
   struct abaccus_struct
   {
   char name_abac[32];
-  long unsigned int begin_x;
-  long unsigned int begin_y;
-  long unsigned int end_x;
-  long unsigned int end_y;
+  unsigned long int  begin_x;
+  unsigned long int  begin_y;
+  unsigned long int  end_x;
+  unsigned long int  end_y;
   } abacus[nb_lines_abaccus];
 
   public:
@@ -35,24 +35,25 @@ class TheReaderUniverse {
 
     void fill_sequence_online(char (&pix_rgb)[5][64]);
 
-    void SetLinesRead(long unsigned int lines) {nb_lines_read=lines;}
-    long unsigned int GetLinesRead() {return nb_lines_read;}
+    void SetLinesRead(unsigned long int  lines) {nb_lines_read=lines;}
+    unsigned long int GetLinesRead() {return nb_lines_read;}
     
-    long unsigned int GetBytesRead() {return nb_bytes_read;}
-    void SetBytesRead(long unsigned int bytes) {nb_bytes_read=bytes;}
+    unsigned long int  GetBytesRead() {return nb_bytes_read;}
+    void SetBytesRead(unsigned long int  bytes) {nb_bytes_read=bytes;}
     
     void load_constellations_abacus();
     void line_extracter(char* input_string, char (&name_value)[5][64]);
-    String return_constellation(long unsigned int pix_x,long unsigned int pix_y);
+    String return_constellation(unsigned long int  pix_x,unsigned long int  pix_y);
 
-    float GetLongitude(long unsigned int pix_x);
-    float GetLatitude(long unsigned int pix_y);
+    float GetLongitude(unsigned long int  pix_x);
+    float GetLatitude(unsigned long int  pix_y);
+    unsigned long injection(unsigned long int which_line);
     
   private:
     
     String itsFileName; 
-    long unsigned int nb_lines_read;
-    long unsigned int nb_bytes_read; 
+    unsigned long int nb_lines_read;
+    unsigned long int  nb_bytes_read; 
 };
 
 #endif

@@ -91,6 +91,14 @@ void setup() {
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
  /* loaded constellations names and position */
   reader_universe.load_constellations_abacus();
+
+/* Injection line test */
+  unsigned long int lines_read=33333;
+  unsigned long int bytes_read=reader_universe.injection(lines_read);
+  Serial.println(lines_read);
+  Serial.println(bytes_read);
+  reader_universe.SetLinesRead(lines_read);
+  reader_universe.SetBytesRead(bytes_read);
 }
 
 void loop() {
@@ -98,22 +106,30 @@ void loop() {
   char xy_RGB[5][64];
   reader_universe.fill_sequence_online(xy_RGB);
 
-  Serial.print(reader_universe.GetLinesRead());
+ /* Serial.print(reader_universe.GetLinesRead());
   Serial.print(" ");
-  Serial.println(reader_universe.GetBytesRead());
+  Serial.println(reader_universe.GetBytesRead());*/
 
-  Serial.print(xy_RGB[0]); Serial.print(" "); Serial.print(xy_RGB[1]); Serial.print(" ");
+  for(int i=0;i<=4;i++) 
+  {
+    Serial.print(xy_RGB[i]); 
+    Serial.print(" ");
+  }
+  Serial.println();
+/*  Serial.print(xy_RGB[0]); Serial.print(" ");
+  Serial.print(xy_RGB[1]); Serial.print(" ");
   Serial.print(xy_RGB[2]); Serial.print(" "); Serial.print(xy_RGB[3]); Serial.print(" ");
-  Serial.print(xy_RGB[4]); Serial.println();
+  Serial.println(xy_RGB[4]); */
 
-  unsigned long px=strtoul(xy_RGB[0],NULL,0);
-  unsigned long py=strtoul(xy_RGB[1],NULL,0);
-  Serial.print(px);
+  
+  unsigned long int px=strtoul(xy_RGB[0],NULL,0);
+  unsigned long int py=strtoul(xy_RGB[1],NULL,0);
   Serial.println("It is the constellation named ");
-  Serial.println(reader_universe.return_constellation(px,py));
-  Serial.println("YEAH");
+  String name_const=reader_universe.return_constellation(px,py);
+  Serial.println(name_const);
 
-
+  
+  
   strip.setBrightness(30);
   for (int i = 0; i < NUMPIXELS; i++)
     strip.setPixelColor(i, atoi(xy_RGB[2]), atoi(xy_RGB[3]), atoi(xy_RGB[4]));
@@ -127,31 +143,31 @@ void loop() {
     // print the results to the serial monitor:
     if (watchdogValue < 800) {
       long address = 0;
-      EEPROMWritelong(address,  lastest_line_bytes[0]);
+      EEPROMWritelong(address, lastest_line_bytes[0]);
       address += 4;
       EEPROMWritelong(address, lastest_line_bytes[1]);
     }
   }
 
 /* Print stuff on the LCD */
-  lcd.setCursor(0, 0);
+/*  lcd.setCursor(0, 0);
   lcd.print("Lines :");
   lcd.print(String(lastest_line_bytes[0]));
   lcd.setCursor(0, 1);
   lcd.print("Bytes :");
-  lcd.print(String(lastest_line_bytes[1]));
+  lcd.print(String(lastest_line_bytes[1]));*/
 
-  px=0;
-  py=0;
-  lcd.setCursor(0, 2);
+  lcd.setCursor(0, 0);
+  lcd.print(" Galactic coordinate");
+  lcd.setCursor(0, 1);
   lcd.print(reader_universe.GetLongitude(px));
   lcd.print((char)223);
-  
-  lcd.setCursor(0, 3);
+  lcd.setCursor(0, 2);
   lcd.print(reader_universe.GetLatitude(py));
-  lcd.print((char)223);   
-
-  delay(1000);
+  lcd.print((char)223);  
+  lcd.setCursor(0, 3); 
+  lcd.print(name_const);
+  delay(1);
 }
 
 void EEPROMWritelong(int address, long value)
