@@ -136,7 +136,6 @@ String TheReaderUniverse::return_constellation(unsigned long int  pix_x, unsigne
       //cout << name <<  " LIne " << i << endl;
       break;
     }
-    else name = "Nothing";
   }
   return name;
 }
