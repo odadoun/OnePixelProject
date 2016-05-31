@@ -32,6 +32,7 @@ void TheReaderUniverse::fill_sequence_online(char (&pix_rgb)[5][64])
     Serial.println(nb_bytes_read);
     Serial.println(nb_lines_read);
     myFile.seek(nb_bytes_read);
+    
     String led_list = "";
     while (myFile.available() && new_line == false)
     {

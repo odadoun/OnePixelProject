@@ -1,10 +1,15 @@
 /*
-  Pixie reads data in at 115.2k serial, 8N1.
-  Byte order is R1, G1, B1, R2, G2, B2, ... where the first triplet is the
-  color of the LED that's closest to the controller. 1ms of silence triggers
-  latch. 2 seconds silence (or overheating) triggers LED off (for safety).
-
-  Do not look into Pixie with remaining eye!
+ * _1PXUniVRS main program
+ * 
+   The Reader for Universe scan
+   O. Dadoun & N. Darrot May 2016
+   odadoun@gmail.com
+   Read an ascii file (located on arduino SD card) onto SDRAM
+   file (with nb_lines) format is
+   pixel_i,pixel_j,Red,Green,Blue ... RGB between 0 up to 255
+   180 Mega lines !!!
+   Load from a file located on arduino SD card the constellation
+   name and positions into memory 75 lignes
 */
 #include "Wire.h"
 #include "Adafruit_LiquidCrystal.h"
@@ -24,8 +29,7 @@ Adafruit_LiquidCrystal lcd(0);
 SoftwareSerial pixieSerial(-1, PIXIEPIN);
 
 Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &pixieSerial);
-// Alternately, can use a hardware serial port for output, e.g.:
-// Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &Serial1);
+
 const int analogInPin = A2;  // Analog input pin used as a watchdog
 int watchdogValue = 0;        // value read from the pot
 
@@ -70,17 +74,10 @@ void setup() {
 
   // set up the LCD's number of rows and columns:
   lcd.begin(20, 4);
-  // Print a message to the LCD.
-  // lcd.print("saved cursor pos");
-  // lcd.setCursor(0, 1);
-  // lcd.print(filePosition);
 
   pixieSerial.begin(115200); // Pixie REQUIRES this baud rate
   // Serial1.begin(115200);  // <- Alt. if using hardware serial port
   strip.setBrightness(255);  // Adjust as necessary to avoid blinding
-  Serial.println("Blue!");
-
- 
   
   Serial.println(EEPROMReadlong(0));
   Serial.println(EEPROMReadlong(4));
@@ -92,35 +89,27 @@ void setup() {
  /* loaded constellations names and position */
   reader_universe.load_constellations_abacus();
 
-/* Injection line test */
-  unsigned long int lines_read=33333;
+/* Injection line test only for test */
+/*  unsigned long int lines_read=500;
   unsigned long int bytes_read=reader_universe.injection(lines_read);
   Serial.println(lines_read);
-  Serial.println(bytes_read);
+  Serial.println(10166912);//bytes_read);
   reader_universe.SetLinesRead(lines_read);
-  reader_universe.SetBytesRead(bytes_read);
+  reader_universe.SetBytesRead(bytes_read);*/
+  
 }
 
 void loop() {
 
   char xy_RGB[5][64];
   reader_universe.fill_sequence_online(xy_RGB);
-
- /* Serial.print(reader_universe.GetLinesRead());
-  Serial.print(" ");
-  Serial.println(reader_universe.GetBytesRead());*/
-
+  
   for(int i=0;i<=4;i++) 
   {
     Serial.print(xy_RGB[i]); 
     Serial.print(" ");
   }
   Serial.println();
-/*  Serial.print(xy_RGB[0]); Serial.print(" ");
-  Serial.print(xy_RGB[1]); Serial.print(" ");
-  Serial.print(xy_RGB[2]); Serial.print(" "); Serial.print(xy_RGB[3]); Serial.print(" ");
-  Serial.println(xy_RGB[4]); */
-
   
   unsigned long int px=strtoul(xy_RGB[0],NULL,0);
   unsigned long int py=strtoul(xy_RGB[1],NULL,0);
@@ -128,8 +117,6 @@ void loop() {
   String name_const=reader_universe.return_constellation(px,py);
   Serial.println(name_const);
 
-  
-  
   strip.setBrightness(30);
   for (int i = 0; i < NUMPIXELS; i++)
     strip.setPixelColor(i, atoi(xy_RGB[2]), atoi(xy_RGB[3]), atoi(xy_RGB[4]));
@@ -148,14 +135,6 @@ void loop() {
       EEPROMWritelong(address, lastest_line_bytes[1]);
     }
   }
-
-/* Print stuff on the LCD */
-/*  lcd.setCursor(0, 0);
-  lcd.print("Lines :");
-  lcd.print(String(lastest_line_bytes[0]));
-  lcd.setCursor(0, 1);
-  lcd.print("Bytes :");
-  lcd.print(String(lastest_line_bytes[1]));*/
 
   lcd.setCursor(0, 0);
   lcd.print(" Galactic coordinate");
