@@ -117,7 +117,7 @@ void loop() {
   String name_const=reader_universe.return_constellation(px,py);
   Serial.println(name_const);
 
-  strip.setBrightness(30);
+ // strip.setBrightness(30);
   for (int i = 0; i < NUMPIXELS; i++)
     strip.setPixelColor(i, atoi(xy_RGB[2]), atoi(xy_RGB[3]), atoi(xy_RGB[4]));
   strip.show();
@@ -146,7 +146,7 @@ void loop() {
   lcd.print((char)223);  
   lcd.setCursor(0, 3); 
   lcd.print(name_const);
-  delay(1);
+  delay(1000);
 }
 
 void EEPROMWritelong(int address, long value)
