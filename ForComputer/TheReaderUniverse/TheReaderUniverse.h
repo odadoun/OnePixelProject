@@ -17,7 +17,6 @@
 using namespace std;
 
 #define nb_lines_abaccus 88
-
 class TheReaderUniverse {
   
   struct abaccus_struct
