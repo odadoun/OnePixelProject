@@ -15,8 +15,13 @@ float colorB = 0.0f;
 bool position_defined = false;
 void GetRGBUniverse()
 {
-	unsigned long int bytes_read=reader_universe.injection(30000);	
-	if(position_defined == false) {reader_universe.SetBytesRead(bytes_read);position_defined=true;}
+	if(position_defined == false) {
+		unsigned long int line_position=6233662;
+	        unsigned long int bytes_read=reader_universe.injection(line_position);	
+		reader_universe.SetBytesRead(bytes_read);
+		reader_universe.SetLinesRead(line_position);
+		position_defined=true;
+	}
 	reader_universe.fill_sequence_online(xy_RGB);
 
 	for(int i=0;i<=4;i++)
@@ -27,8 +32,14 @@ void GetRGBUniverse()
 	int n=reader_universe.GetLinesRead();
 	int tot_bytes=reader_universe.GetBytesRead();
 
-	cout << "Nb Lines:" << n+1 << endl;
+	//reader_universe.load_constellations_abacus();
+	cout << "Nb Lines read:" << n << endl;
 	cout << "Tot bytes:" << tot_bytes << endl;
+	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
+	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
+	string name_const=reader_universe.return_constellation(px,py);
+	cout << "Constellation named  : " << name_const << endl;
+	cout << " Galactic coordinate "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
 }
 void timer( int value )
 {
@@ -59,6 +70,9 @@ void renderScene()
 /* ************************* */
 int main(int argc, char **argv)
 {
+	reader_universe.myFile.open("test1.txt", std::ifstream::in);
+	reader_universe.load_constellations_abacus();
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(320, 320);
