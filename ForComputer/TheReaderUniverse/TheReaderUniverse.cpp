@@ -10,8 +10,9 @@
 */
 #include "TheReaderUniverse.h"
 
-TheReaderUniverse::TheReaderUniverse(): itsFileName("ONEPIXEL.TXT"), nb_lines_read(0), nb_bytes_read(0)
+TheReaderUniverse::TheReaderUniverse(): itsFileName("test1.txt"), nb_lines_read(0), nb_bytes_read(0)
 {
+    myFile.open("test1.txt", std::ifstream::in);
     cout << "In the Reader Constructor" << endl;
 }
 
@@ -43,6 +44,7 @@ void TheReaderUniverse::fill_sequence_online(char (&pix_rgb)[5][64])
       }
       else new_line = true;
     }
+     
     line_length = temp.length() + 1;
     nb_bytes_read += line_length;
     nb_lines_read++;
@@ -172,15 +174,16 @@ float TheReaderUniverse::GetLatitude(unsigned long int pix_y)
   return latitude;
 }
 
-
+#endif
 unsigned long int TheReaderUniverse::injection(unsigned long int which_line)
 {
-        File fp = SD.open("ONEPIXEL.TXT", FILE_READ);  
+        ifstream fp;
+        fp.open("test1.txt", std::ifstream::in);
         unsigned long int nb_bytes_read=0;
         char c;
         unsigned long int counter=1;
-        while (fp.available()) {
-        char c = fp.read();
+        while (!fp.eof()) {
+        fp.read(&c,1);
         if(counter<=which_line)
         {
           if (c != '\n' )  nb_bytes_read+=1;
@@ -191,4 +194,4 @@ unsigned long int TheReaderUniverse::injection(unsigned long int which_line)
         fp.close();
         return nb_bytes_read+counter-1; // \n need to be count
 }
-#endif
+
