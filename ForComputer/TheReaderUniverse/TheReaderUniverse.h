@@ -1,13 +1,10 @@
 /* The Reader for Universe scan
-   O. Dadoun & N. Darrot May 2016
-   odadoun@gmail.com
-   Read an ascii file (located on arduino SD card) onto SDRAM
-   file (with nb_lines) format is
-   pixel_i,pixel_j,Red,Green,Blue ... RGB between 0 up to 255 
-   180 Mega lines !!!
-   Load from a file located on arduino SD card the constellation 
-   name and positions into memory 75 lignes 
-*/
+ O. Dadoun & N. Darrot October 2016
+ odadoun@gmail.com
+ Read an ascii file:
+ pixel_i,pixel_j,Red,Green,Blue ... RGB between 0 up to 255
+ 180 Mega lines !!!
+ */
 
 #ifndef _TheReaderUniverse_
 #define _TheReaderUniverse_H_
