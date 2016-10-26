@@ -1,3 +1,8 @@
+/*
+ * O. Dadoun & N. Darrot October 2016
+ * odadoun@gmail.com 
+ * Use GLUT to display pixel color
+ */
 #include <iostream>
 #include "TheReaderUniverse/TheReaderUniverse.h"
 
@@ -16,7 +21,7 @@ bool position_defined = false;
 void GetRGBUniverse()
 {
 	if(position_defined == false) {
-		unsigned long int line_position=6233662;
+		unsigned long int line_position=62336;
 	        unsigned long int bytes_read=reader_universe.injection(line_position);	
 		reader_universe.SetBytesRead(bytes_read);
 		reader_universe.SetLinesRead(line_position);
@@ -32,14 +37,13 @@ void GetRGBUniverse()
 	int n=reader_universe.GetLinesRead();
 	int tot_bytes=reader_universe.GetBytesRead();
 
-	//reader_universe.load_constellations_abacus();
-	cout << "Nb Lines read:" << n << endl;
-	cout << "Tot bytes:" << tot_bytes << endl;
+	cout << "Nb Lines read : " << n << endl;
+	cout << "Tot bytes : "     << tot_bytes << endl;
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
-	string name_const=reader_universe.return_constellation(px,py);
-	cout << "Constellation named  : " << name_const << endl;
-	cout << " Galactic coordinate "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+	string name_const = reader_universe.return_constellation(px,py);
+	cout << "Constellation name  : " << name_const << endl;
+	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
 }
 void timer( int value )
 {
@@ -76,7 +80,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(320, 320);
-	glutCreateWindow("tutorial example");
+	glutCreateWindow("One Pixel Universe");
 	glutDisplayFunc(renderScene);
 	glutTimerFunc( 0, timer, 0 );
 	glutMainLoop();
