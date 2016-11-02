@@ -38,11 +38,13 @@ void GetRGBUniverse()
 {
 	if(position_defined == false) {
 		unsigned long int line_position;
-		int temp;
 		last_line_read.open("llr",ios::in);
-		last_line_read >> temp;
-		line_position=uint(temp);
+		if (last_line_read.is_open())
+		{
+		last_line_read >> line_position;
 		last_line_read.close();
+		}
+		else line_position=0;
 		cout << " From the last line read, start @ line " << line_position <<endl;
 	        unsigned long int bytes_read=reader_universe.injection(line_position);	
 		reader_universe.SetLinesRead(line_position);
@@ -96,7 +98,6 @@ void renderScene()
 /* ************************* */
 int main(int argc, char **argv)
 {
-	last_line_read.open("llr");
 	reader_universe.myFile.open("test1.txt", std::ifstream::in);
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
