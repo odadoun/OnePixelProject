@@ -4,8 +4,9 @@
  * Use GLUT to display pixel color
  */
 #include <iostream>
+#include <fstream> 
 #include "TheReaderUniverse/TheReaderUniverse.h"
-
+#include <csignal>
 #include <stdio.h>
 #include <GL/glut.h>
 #include <unistd.h>
@@ -13,18 +14,39 @@
 TheReaderUniverse reader_universe;
 char xy_RGB[5][64];
 
+//ofstream last_line_read("llr");
+fstream last_line_read;
+//std::ofstream last_line_read("llr");
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
 float colorB = 0.0f;
 bool position_defined = false;
+/* To catch CTRL C signal*/
+void signalHandler( int signum ) {
+	cout << "Interrupt signal (" << signum << ") received.\n";
+	cout << "Write last line number read into llr file ..." << reader_universe.GetLinesRead() << endl;
+	// Catch last line read
+	last_line_read.open("llr",ios::out);
+	last_line_read << reader_universe.GetLinesRead();
+	last_line_read.close();
+        // cleanup and close up stuff here  
+	// terminate program  
+	exit(signum);  
+}
 void GetRGBUniverse()
 {
 	if(position_defined == false) {
-		unsigned long int line_position=62336;
+		unsigned long int line_position;
+		int temp;
+		last_line_read.open("llr",ios::in);
+		last_line_read >> temp;
+		line_position=uint(temp);
+		last_line_read.close();
+		cout << " From the last line read, start @ line " << line_position <<endl;
 	        unsigned long int bytes_read=reader_universe.injection(line_position);	
-		reader_universe.SetBytesRead(bytes_read);
 		reader_universe.SetLinesRead(line_position);
+		reader_universe.SetBytesRead(bytes_read);
 		position_defined=true;
 	}
 	reader_universe.fill_sequence_online(xy_RGB);
@@ -74,9 +96,10 @@ void renderScene()
 /* ************************* */
 int main(int argc, char **argv)
 {
+	last_line_read.open("llr");
 	reader_universe.myFile.open("test1.txt", std::ifstream::in);
 	reader_universe.load_constellations_abacus();
-	
+	signal(SIGINT, signalHandler);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(320, 320);
@@ -85,6 +108,5 @@ int main(int argc, char **argv)
 	glutTimerFunc( 0, timer, 0 );
 	glutMainLoop();
 	glutMainLoop();
-
 	return 0;
 }
