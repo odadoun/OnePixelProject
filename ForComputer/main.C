@@ -158,10 +158,12 @@ void renderScene()
         char temp[256];
 	//empty or there is a constellation name ?
 	if(name_const != "")
-		sprintf(temp,"Constellation name : %s \t\t Galactic coordinates: \t ( %f , %f )",name_const.c_str(),
-			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
+		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°  / Constellation name : %s ",
+				reader_universe.GetLinesRead(),
+			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py),name_const.c_str());
 	else
-		sprintf(temp,"Galactic coordinates: \t ( %f , %f )",
+		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°",
+				reader_universe.GetLinesRead(),
 			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
 	string sentence = string(temp);
 	printtext(5,10,sentence);
