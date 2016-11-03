@@ -154,11 +154,16 @@ void renderScene()
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
-	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+	cout << name_const.size() << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
         char temp[256];
-	sprintf(temp,"\t\t Galactic coordinates: \t ( %f , %f )",reader_universe.GetLongitude(px),
-			reader_universe.GetLongitude(py));
-	string sentence = "Constellation name : " + name_const + "       "  + string(temp);
+	//empty or there is a constellation name ?
+	if(name_const != "")
+		sprintf(temp,"Constellation name : %s \t\t Galactic coordinates: \t ( %f , %f )",name_const.c_str(),
+			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
+	else
+		sprintf(temp,"Galactic coordinates: \t ( %f , %f )",
+			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
+	string sentence = string(temp);
 	printtext(5,10,sentence);
 	glutSwapBuffers();
 }
