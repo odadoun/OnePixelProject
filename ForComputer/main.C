@@ -12,62 +12,24 @@
 #include <GL/freeglut.h>
 #include <unistd.h>
 
-TheReaderUniverse reader_universe;
-char xy_RGB[5][64];
-fstream last_line_read;
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
 float colorB = 0.0f;
-int WindowHeight = 300;
-int WindowWidth = 300;
-bool position_defined = false;
-void printtext(int x, int y, string String)
-{
-	//(x,y) is from the bottom left of the window
-	glColor3f(0,0,0);
-	glDisable(GL_LIGHTING);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WindowWidth, 0, WindowHeight, -1.0f, 1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glPushAttrib(GL_DEPTH_TEST);
-	glDisable(GL_DEPTH_TEST);
-	glRasterPos2i(x,y);
-	for (int i=0; i<String.size(); i++)
-	{
-		//glutBitmapCharacter(GLUT_BITMAP_9_BY_15, String[i]);
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, String[i]);
-	}
-	glPopAttrib();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-}
-
-void display(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-
-	char string[64];
-	sprintf(string, "something");
-	printtext(10,10,string);
-
-	glutSwapBuffers();
-}
-
+int WindowHeight = 600;
+int WindowWidth = 600;
 /* ************************* */
 void signalHandler(int signum);
 void GetRGBUniverse();
-void renderScene();
 void timer(int value);
+void printtext(int x, int y, string String);
+void renderScene();
 /* ************************* */
+/* ************************* */
+TheReaderUniverse reader_universe;
+char xy_RGB[5][64];
+fstream last_line_read;
+bool position_defined = false;
 int main(int argc, char **argv)
 {
 	reader_universe.myFile.open("test1.txt", std::ifstream::in);
@@ -82,6 +44,7 @@ int main(int argc, char **argv)
 	glutMainLoop();
 	return 0;
 }
+/* ************************* */
 /* ************************* */
 /* To catch CTRL C signal*/
 void signalHandler(int signum) 
@@ -156,6 +119,32 @@ void timer(int value)
 	glutTimerFunc( time_random, timer, 0 );
 }
 /* ************************* */   
+void printtext(int x, int y, string String)
+{
+	//(x,y) is from the bottom left of the window
+	glColor3f(0,0,0);
+	glDisable(GL_LIGHTING);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, WindowWidth, 0, WindowHeight, -1.0f, 1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glPushAttrib(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glRasterPos2i(x,y);
+	for (int i=0; i<String.size(); i++)
+	{
+		//glutBitmapCharacter(GLUT_BITMAP_9_BY_15, String[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, String[i]);
+	}
+	glPopAttrib();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
 /* ************************* */   
 void renderScene()
 {
@@ -167,8 +156,9 @@ void renderScene()
 	string name_const = reader_universe.return_constellation(px,py);
 	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
         char temp[256];
-	sprintf(temp,"        %f   %f",reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
-	string sentence = name_const + "       "  + string(temp);
+	sprintf(temp,"\t\t Galactic coordinates: \t ( %f , %f )",reader_universe.GetLongitude(px),
+			reader_universe.GetLongitude(py));
+	string sentence = "Constellation name : " + name_const + "       "  + string(temp);
 	printtext(5,10,sentence);
 	glutSwapBuffers();
 }
