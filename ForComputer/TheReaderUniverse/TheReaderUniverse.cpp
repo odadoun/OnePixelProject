@@ -184,6 +184,12 @@ unsigned long int TheReaderUniverse::injection(unsigned long int which_line)
 {
     ifstream fp;
     fp.open(itsFileName, std::ifstream::in);
+    if (!fp.is_open())
+     {
+     	cout << " Msg from injection method, can't open " << itsFileName << 
+		" check ... This can't happen !!! bug from the MATRIX !!!" << endl;
+	exit(1);	
+     }	     
     unsigned long int nb_bytes_read=0;
     char c;
     unsigned long int counter=1;
