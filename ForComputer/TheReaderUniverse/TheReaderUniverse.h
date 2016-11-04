@@ -26,7 +26,7 @@ class TheReaderUniverse {
   } abacus[nb_lines_abaccus];
 
   public:
-    TheReaderUniverse();
+    TheReaderUniverse(string FileName);
     ~TheReaderUniverse();
     
     ifstream myFile;

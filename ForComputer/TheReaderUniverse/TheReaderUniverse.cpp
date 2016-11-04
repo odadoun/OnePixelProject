@@ -7,9 +7,16 @@
  */
 #include "TheReaderUniverse.h"
 
-TheReaderUniverse::TheReaderUniverse(): itsFileName("test1.txt"), nb_lines_read(0), nb_bytes_read(0)
+TheReaderUniverse::TheReaderUniverse(string FileName): itsFileName(FileName), nb_lines_read(0), nb_bytes_read(0)
 {
-    cout << "In the Reader Constructor" << endl;
+    cout << "In the Reader Constructor file " << itsFileName << " will be opened" << endl;
+    myFile.open(itsFileName, std::ifstream::in);
+    if (!myFile.is_open())
+     {
+     	cout << " Can't open " << itsFileName << 
+		" check ... I need to exit from the TheReaderUniverse constructor bye :'( " << endl;
+	exit(1);	
+     }	     
 }
 
 TheReaderUniverse::~TheReaderUniverse()
@@ -92,7 +99,7 @@ void TheReaderUniverse::load_constellations_abacus()
     myFile.open("const.txt", std::ifstream::in);
     
     /* NAME_CONSTELLATION MIN_X MIN_Y MAX_X MAX_Y */
-    cout << " Constellation abacus opened " << endl;
+    cout << "*** Constellation abacus file opened ***" << endl;
     
     int nb_lines = 0;
 
@@ -126,7 +133,7 @@ void TheReaderUniverse::load_constellations_abacus()
     }
     myFile.close();
 
-    cout << "File closed " << endl;
+    cout << "*** Constellation abacus file closed ***" << endl;
 }
 
 string TheReaderUniverse::return_constellation(unsigned long int  pix_x, unsigned long int  pix_y)
@@ -176,7 +183,7 @@ float TheReaderUniverse::GetLatitude(unsigned long int pix_y)
 unsigned long int TheReaderUniverse::injection(unsigned long int which_line)
 {
     ifstream fp;
-    fp.open("test1.txt", std::ifstream::in);
+    fp.open(itsFileName, std::ifstream::in);
     unsigned long int nb_bytes_read=0;
     char c;
     unsigned long int counter=1;
