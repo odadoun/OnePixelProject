@@ -26,13 +26,12 @@ void printtext(int x, int y, string String);
 void renderScene();
 /* ************************* */
 /* ************************* */
-TheReaderUniverse reader_universe;
+TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
 bool position_defined = false;
 int main(int argc, char **argv)
 {
-	reader_universe.myFile.open("test1.txt", std::ifstream::in);
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
 	glutInit(&argc, argv);
@@ -73,10 +72,11 @@ void GetRGBUniverse()
 		}
 		else 
 			line_position=0;
-		cout << " From the last line read, start @ line " << line_position <<endl;
 		unsigned long int bytes_read=reader_universe.injection(line_position);	
 		reader_universe.SetLinesRead(line_position);
 		reader_universe.SetBytesRead(bytes_read);
+		cout << " From the last line read, start @ line " << line_position 
+		     << " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
 		position_defined=true;
 	}
 	reader_universe.fill_sequence_online(xy_RGB);
@@ -154,7 +154,7 @@ void renderScene()
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
-	cout << name_const.size() << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+	//cout << name_const.size() << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
         char temp[256];
 	//empty or there is a constellation name ?
 	if(name_const != "")
@@ -162,7 +162,7 @@ void renderScene()
 				reader_universe.GetLinesRead(),
 			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py),name_const.c_str());
 	else
-		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°",
+		sprintf(temp,"Pixel %d / Galactic coordinates \t %f , %f",
 				reader_universe.GetLinesRead(),
 			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
 	string sentence = string(temp);
