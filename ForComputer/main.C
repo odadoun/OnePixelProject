@@ -16,30 +16,48 @@
 float colorR = 0.0f;
 float colorG = 0.0f;
 float colorB = 0.0f;
-int WindowHeight = 600;
-int WindowWidth = 600;
+int WindowHeight = 400;
+int WindowWidth = 400;
 /* ************************* */
 void signalHandler(int signum);
 void GetRGBUniverse();
 void timer(int value);
 void printtext(int x, int y, string String);
+void renderSceneLabels();
 void renderScene();
-/* ************************* */
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
 bool position_defined = false;
+int window_labels, window1, window2;  
+/* ************************* */
 int main(int argc, char **argv)
 {
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
+	
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
+	
 	glutInitWindowSize(WindowWidth,WindowHeight);
-	glutCreateWindow("One Pixel Universe");
-	glutDisplayFunc(renderScene);
+	glutInitWindowPosition(WindowWidth/2, WindowHeight/2);
 	glutTimerFunc( 0, timer, 0 );
+	window_labels=glutCreateWindow("One Pixel Universe labels");
+	glutDisplayFunc(renderSceneLabels);
+
+	glutInitWindowSize(WindowWidth,WindowHeight);
+	glutInitWindowPosition(WindowWidth, WindowHeight);
+	window1=glutCreateWindow("One Pixel Universe (1)");
+	glutDisplayFunc(renderScene);
+	
+	glutInitWindowSize(WindowWidth,WindowHeight);
+	glutInitWindowPosition(WindowWidth*2, WindowHeight*2);
+	window2=glutCreateWindow("One Pixel Universe (2)");
+	glutDisplayFunc(renderScene);
+
+	glutTimerFunc( 0, timer, 0 );
+	
 	glutMainLoop();
 	return 0;
 }
@@ -76,7 +94,7 @@ void GetRGBUniverse()
 		reader_universe.SetLinesRead(line_position);
 		reader_universe.SetBytesRead(bytes_read);
 		cout << " From the last line read, start @ line " << line_position 
-		     << " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
+			<< " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
 		position_defined=true;
 	}
 	reader_universe.fill_sequence_online(xy_RGB);
@@ -116,13 +134,23 @@ void timer(int value)
 	int time_random;
 	time_random = 10 + rand()%1000;
 	cout << " Time random " << time_random << endl;
+	
+	glutSetWindow(window_labels);
+	glutPostRedisplay();  // Update screen label
+		 
+	glutSetWindow(window1);
+	glutPostRedisplay();  // Update screen 1
+	
+	glutSetWindow(window2);
+	glutPostRedisplay();  // Update screen 2
+	
 	glutTimerFunc( time_random, timer, 0 );
 }
 /* ************************* */   
 void printtext(int x, int y, string String)
 {
 	//(x,y) is from the bottom left of the window
-	glColor3f(0,0,0);
+	glColor3f(127,127,127);
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -146,8 +174,9 @@ void printtext(int x, int y, string String)
 	glPopMatrix();
 }
 /* ************************* */   
-void renderScene()
+void renderSceneLabels()
 {
+	cout << " renderSceneLabels" << colorR << " " << colorG <<  " " << colorB << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(colorR, colorG, colorB);
 	glRectf(-1.f,1.f, 1.f, -1.f);
@@ -155,18 +184,27 @@ void renderScene()
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
 	//cout << name_const.size() << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
-        char temp[256];
+	char temp[256];
 	//empty or there is a constellation name ?
 	if(name_const != "")
 		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°  / Constellation name : %s ",
 				reader_universe.GetLinesRead(),
-			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py),name_const.c_str());
+				reader_universe.GetLongitude(px),reader_universe.GetLongitude(py),name_const.c_str());
 	else
 		sprintf(temp,"Pixel %d / Galactic coordinates \t %f , %f",
 				reader_universe.GetLinesRead(),
-			reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
+				reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
 	string sentence = string(temp);
 	printtext(5,10,sentence);
+	glutSwapBuffers();
+}
+/* ************************* */   
+void renderScene()
+{
+	cout << " renderScene" << colorR << " " << colorG <<  " " << colorB << endl;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(colorR, colorG, colorB);
+	glRectf(-1.f,1.f, 1.f, -1.f);
 	glutSwapBuffers();
 }
 /* ************************* */
