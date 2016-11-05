@@ -97,7 +97,12 @@ void TheReaderUniverse::load_constellations_abacus()
     string temp = "";
     ifstream myFile;
     myFile.open("const.txt", std::ifstream::in);
-    
+    if (!myFile.is_open())
+    {
+         cout << " Can't open " << "const.txt" <<
+         " check ... I need to exit from the load_constellations_abacus constructor bye :'( " << endl;
+         exit(1);
+     }	
     /* NAME_CONSTELLATION MIN_X MIN_Y MAX_X MAX_Y */
     cout << "*** Constellation abacus file opened ***" << endl;
     
