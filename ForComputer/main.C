@@ -150,7 +150,7 @@ void timer(int value)
 void printtext(int x, int y, string String)
 {
 	//(x,y) is from the bottom left of the window
-	glColor3f(127,127,127);
+	glColor3f(127./255.,127./255.,127./255.);
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
