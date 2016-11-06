@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O3 -ansi -Wall
+CXXFLAGS = -O3 -ansi -Wall -std=c++11 
 DEBUGFLAGS = -g -ansi -Wall
 INCLUDE = -I./TheReaderUniverse
 
