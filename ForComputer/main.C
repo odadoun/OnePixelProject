@@ -104,8 +104,8 @@ void GetRGBUniverse()
 		cout << " xy RGB values : " << xy_RGB[i] << endl;
 	}
 
-	int n=reader_universe.GetLinesRead();
-	int tot_bytes=reader_universe.GetBytesRead();
+	unsigned long int n=reader_universe.GetLinesRead();
+	unsigned long int tot_bytes=reader_universe.GetBytesRead();
 
 	cout << "Nb Lines read : " << n << endl;
 	cout << "Tot bytes : "     << tot_bytes << endl;
