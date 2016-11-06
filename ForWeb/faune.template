@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>!!FAUNE!!</title>
+
+<script type="text/javascript">
+setTimeout(function () { 
+location.reload();
+}, TEMPLATE_TIME);
+</script>
+
+<style>
+	body { 
+	background-color: TEMPLATE_RGB;
+	height: 100%;
+	}
+	body:focus { 
+		outline: none;
+	}
+	.footer {
+		margin: 0;
+		width: 700px ;
+		height: 20px ;
+		display: block ;
+		text-align: right;
+		color: rgb(127,127,127) ;
+		bottom: 0;
+		position:absolute;
+	}
+</style>
+	    </head>
+	    <body>
+		    <div class="footer">TEMPLATE_LABEL</div>
+	    </body>
+</html>
