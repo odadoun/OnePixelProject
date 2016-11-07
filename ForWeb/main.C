@@ -93,7 +93,7 @@ void GetRGBUniverse()
 	html_template.open("faune.template", ios::in | ios::out );
 	if (!html_template)
 	{
-		cerr << "Could not open " << " css template" << endl;
+		cerr << "Could not open " << " faune template" << endl;
 		exit(1);
 	}
 	char temp[256];
@@ -109,9 +109,15 @@ void GetRGBUniverse()
 	replace_by[1]="rgb("+string(xy_RGB[2])+","+string(xy_RGB[3])+","+string(xy_RGB[4])+")";
 	char nb_read[256];
 	sprintf(nb_read,"%lu",n);
+	if(name_const != "")
+	{
 	replace_by[2]="Pixel " + to_string(n) + " / Galactic coordinates " + 
 		to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py))
 		+ " / Constellation name : "+name_const;
+	}
+	else
+	replace_by[2]="Pixel " + to_string(n) + " / Galactic coordinates " +
+	                to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));	
 	string to_replace[]={"TEMPLATE_TIME","TEMPLATE_RGB","TEMPLATE_LABEL"};
 	html.open("faune.html");
 	while (getline(html_template, line))
