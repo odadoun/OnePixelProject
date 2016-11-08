@@ -103,26 +103,35 @@ void GetRGBUniverse()
 	string line;
 	char char_microseconds[256];
 	sprintf(char_microseconds,"%d",microseconds/1000);
-	string replace_by[3];	
+	string replace_by[6];	
 	replace_by[0]=string(char_microseconds);
 	cout << " replace " << replace_by[1] << endl;
 	replace_by[1]="rgb("+string(xy_RGB[2])+","+string(xy_RGB[3])+","+string(xy_RGB[4])+")";
 	char nb_read[256];
 	sprintf(nb_read,"%lu",n);
+	replace_by[2]=to_string(n);
+	replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
+		
 	if(name_const != "")
 	{
-	replace_by[2]="Pixel " + to_string(n) + " / Galactic coordinates " + 
-		to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py))
-		+ " / Constellation name : "+name_const;
+	 replace_by[4]="Constellation name :";
+ 	 replace_by[5]=name_const;	 
+//		replace_by[4]="Pixel " + to_string(n) + " / Galactic coordinates " + 
+//		to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py))
+//		+ " / Constellation name : "+name_const;
 	}
 	else
-	replace_by[2]="Pixel " + to_string(n) + " / Galactic coordinates " +
-	                to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));	
-	string to_replace[]={"TEMPLATE_TIME","TEMPLATE_RGB","TEMPLATE_LABEL"};
+	{
+		replace_by[4]="";	
+		replace_by[5]="";
+	}
+		//replace_by[4]="Pixel " + to_string(n) + " / Galactic coordinates " +
+	//                to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));	
+	string to_replace[]={"TEMPLATE_TIME","TEMPLATE_RGB","TEMPLATE_PIXEL","TEMPLATE_COORD","APPEAR_OR_NOT","TEMPLATE_LABEL"};
 	html.open("faune.html");
 	while (getline(html_template, line))
 	{
-		for(int i=0;i<3;i++)
+		for(int i=0;i<6;i++)
 		{
 	 	size_t len = to_replace[i].length();
 		size_t pos = line.find(to_replace[i]);

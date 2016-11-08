@@ -1,0 +1,159 @@
+
+.faunepixel {
+	
+}
+
+.faunecoord {
+	
+	
+}
+.faunename {
+	
+	
+}
+.element {
+	mix-blend-mode: exclusion;
+}
+.faunelegende {
+	margin: 0px;
+	font-size: 12px;
+	padding-top: 10px;
+	padding-right: 5px;
+	padding-bottom: 0px;
+	padding-left: 5px;
+}
+
+
+
+
+
+
+
+@media only screen and (min-width: 1137px) {
+	
+.faunepixel {
+	color: #fff;
+	font-size: 14px;
+	background-color: #000;
+	padding: 5px;
+	display: inline-block;
+	margin: 0px;
+	
+}
+
+.faunecoord {
+	color: #fff;
+	font-size: 14px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;	
+}
+.faunename{
+	color: #fff;
+	font-size: 14px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;	
+}
+
+.element {
+	margin-top: 0px; /* poussé de la moitié de hauteur de viewport */
+	transform: none; /* tiré de la moitié de sa propre hauteur */
+	padding: 0px;
+	bottom: 0px;
+	position: absolute;
+	margin-bottom: 0px;
+}
+
+}
+
+
+
+
+@media only screen and (min-width: 321px) and (max-width: 1136px) {
+	
+.faunepixel {
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	display: inline-block;
+	margin: 0px;
+	
+}
+
+.faunecoord {
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;
+}
+.faunename{
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;
+}
+
+.element {
+	margin-top: 50vh; /* poussé de la moitié de hauteur de viewport */
+	transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
+	padding: 0px;
+	
+	
+}
+
+}
+
+@media only screen and (max-width:320px) {
+
+
+.faunepixel {
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	display: inline-block;
+	margin: 0px;
+	
+}	
+		
+.faunecoord {
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;
+}
+
+.faunename {
+	color: #fff;
+	font-size: 22px;
+	background-color: #000;
+	padding: 5px;
+	margin: 0px;
+	display: inline-block;
+}
+
+
+.element {
+	margin-top: 50vh; /* poussé de la moitié de hauteur de viewport */
+	transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
+	padding: 0px;
+	
+	
+}
+
+
+
+}
+
+
+

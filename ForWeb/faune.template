@@ -1,36 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>!!FAUNE!!</title>
-
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>!!FAUNE!!</title>
+        <meta name="description" content="UFAUNE - Nicolas Darrot" />
+        <meta name="viewport" content="initial-scale=1">
+        <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="faune.css">
 <script type="text/javascript">
-setTimeout(function () { 
-location.reload();
-}, TEMPLATE_TIME);
+			setTimeout(function () {
+					location.reload();
+					}, TEMPLATE_TIME);
 </script>
 
 <style>
-	body { 
+	html,
+body {
 	background-color: TEMPLATE_RGB;
-	height: 100%;
-	}
-	body:focus { 
-		outline: none;
-	}
-	.footer {
-		margin: 0;
-		width: 700px ;
-		height: 20px ;
-		display: block ;
-		text-align: right;
-		color: rgb(127,127,127) ;
-		bottom: 0;
-		position:absolute;
-	}
+	margin: 0px;
+	padding: 0px;
+	text-align: left;
+	font-family: Oswald, sans-serif;
+	font-weight: 100;
+	text-transform: uppercase;
+	font-size: 12px;
+	color: #FFF;
+	letter-spacing: 0.2em;
+	word-spacing: 0.2em;
+}
+
+
 </style>
-	    </head>
-	    <body>
-		    <div class="footer">TEMPLATE_LABEL</div>
-	    </body>
+		</head>
+		<body>
+			<div class="element">
+           <div class="faunelegende">Pixel: </div>
+           <div class="faunepixel">TEMPLATE_PIXEL</div>
+           <div class="faunelegende">Galactic coordinates: </div>
+            <div class="faunecoord">TEMPLATE_COORD</div>
+	    <!--<div class="faunelegende">Constellation name: </div>-->
+	    <div class="faunelegende"> </div>
+            <div class="faunename">TEMPLATE_LABEL</div>
+            </div>
+		</body>
 </html>
+
+
