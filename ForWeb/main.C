@@ -9,7 +9,7 @@
 #include <csignal>
 #include <stdio.h>
 #include <unistd.h>
-
+#include <math.h>
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
@@ -21,10 +21,14 @@ void signalHandler(int signum);
 void GetRGBUniverse();
 /* ************************* */
 /* ************************* */
-/* Force the rand to be egal according to linux, Arduino, mac os what ever platform
- * see http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf for explanation */
-unsigned long my_rand(void);
-void my_srand(unsigned long seed);
+/* Force the rand to be egal according to linux, Arduino, mac os what ever platform */
+/* see Pseudo-random sequence generation functions */
+/* in http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf for explanation */
+static unsigned long int my_next = 1;
+int my_rand(void);
+void my_srand(unsigned int seed);
+unsigned int init_start = 2000000;
+unsigned int my_microseconds;
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
@@ -41,11 +45,12 @@ int main(int argc, char **argv)
 	while(1) {
 		microseconds = (1000+rand()%2000)*1000;
 		cout << microseconds << endl;
-		unsigned long  init_start = 2000000;
-		unsigned long my_microseconds=init_start+(unsigned int)(my_rand()*2*init_start)/32768;
-		microseconds=my_microseconds;
-		cout << " my " << my_microseconds<< endl;
-		usleep(my_microseconds);
+		my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;
+		//Due to ms time pause in opengl this is a good trick
+		microseconds=floor(my_microseconds/1000)*1000;
+	        microseconds=my_microseconds;
+		cout << " my " << microseconds << endl;
+		usleep(microseconds);
 		GetRGBUniverse();
 	}	
 		return 0;
@@ -150,7 +155,7 @@ void GetRGBUniverse()
 	cout << "Tot bytes : "     << tot_bytes << endl;
 	cout << "Constellation name  : " << name_const << endl;
 	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
-
+	cout << " **** **** " << endl;
 // to provide an output easely ./reader 2>toto
 #if 0
 replace_by[4]="Constellation name :";
@@ -161,13 +166,12 @@ cerr << "Constellation name : \t "<< name_const << "\n" << endl;
 }
 /* ************************* */
 /* ************************* */
-static unsigned long int my_next = 1;
-unsigned long my_rand(void) // RAND_MAX assumed to be 32767
+int my_rand(void) // RAND_MAX assumed to be 32767
 {
 	 my_next = my_next * 1103515245 + 12345;
-	  return (unsigned long)(my_next/65536) % 32768;
+	  return (unsigned int)(my_next/65536) % 32768;
 }
-void my_srand(unsigned long seed) {
+void my_srand(unsigned int seed) {
 	        my_next=seed;
 }
 /* ************************* */   
