@@ -3,6 +3,8 @@
  * odadoun@gmail.com 
  * Use GLUT to display pixel color
  */
+/* Use this function glutIdleFunc instead of glutTimerFunc
+ see https://mycodelog.com/2010/04/16/fps    */
 #include <iostream>
 #include <fstream> 
 #include "TheReaderUniverse/TheReaderUniverse.h"
@@ -24,6 +26,7 @@ void GetRGBUniverse();
 void ReadLastLine();
 void idle(void);
 void calculateTime();
+int *complementary_color(int r,int g,int b);
 void printtext(int x, int y, string String);
 void renderSceneLabels();
 void renderScene();
@@ -34,11 +37,11 @@ void renderScene();
 static unsigned long int my_next = 1;
 int my_rand(void);
 void my_srand(unsigned int seed);
+unsigned int my_microseconds = 0;
 unsigned int init_start = 1000000;
 int currentTime = 0;
 int previousTime = 0;
-unsigned int my_milliseconds;
-int milliseconds = 0;
+int micro_chronos = 0;
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
@@ -49,7 +52,7 @@ int main(int argc, char **argv)
 {
 	//start to read the last line in llr
 	ReadLastLine();
-        my_srand(12);	
+    my_srand(12);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WindowWidth,WindowHeight);
@@ -126,18 +129,16 @@ void GetRGBUniverse()
 	cout << "Constellation name  : " << name_const << endl;
 	cout << "Galactic coordinates "  <<  reader_universe.GetLongitude(px) << " "
 	     << reader_universe.GetLatitude(py) << endl;
-	cout << " **** **** " << milliseconds << endl;
+	cout << " **** **** " << my_microseconds << endl;
 }
 /* ************************* */
 void idle(void)
 {
-        cout << " TOTOT 1" << endl;
-	my_milliseconds=init_start+init_start*(my_rand()/32768.);
-        cout << " TOTOT " << my_milliseconds << endl;
-	usleep(my_milliseconds);
+	my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;
+    cerr<< " Micro DODO " << my_microseconds << endl;
+	usleep(my_microseconds);
 	GetRGBUniverse();
         calculateTime();
-	cout << " TOTOT 3" << endl;
 	colorR = (atoi(xy_RGB[2])/255.);
 	colorG = (atoi(xy_RGB[3])/255.);
 	colorB = (atoi(xy_RGB[4])/255.);
@@ -167,30 +168,34 @@ void calculateTime()
 
     //  Calculate time passed
     int timeInterval = currentTime - previousTime;
-    milliseconds = timeInterval;
+    micro_chronos = timeInterval;
     previousTime = currentTime;    
 
-    if(timeInterval > 1000)  previousTime = currentTime;
-    else previousTime=1000;
+  //  if(timeInterval > 1000)  previousTime = currentTime;
+  //  else previousTime=1000;
     
- /* if(timeInterval > 1000)
+ if(timeInterval > 1000)
     {
-        //  calculate the number of frames per second
-        milliseconds = timeInterval;//frameCount / (timeInterval / 1000.0f);
-
+        micro_chronos = timeInterval;
         //  Set time
         previousTime = currentTime;
-
-        //  Reset frame count
-        frameCount = 0;
     }
-    */
+}
+int *complementary_color(int r,int g,int b)
+{
+	int *array= new int[3];
+	array[0]=255-r;
+	array[1]=255-g;
+	array[2]=255-b;
+	return array;
 }
 /* ************************* */   
 void printtext(int x, int y, string String)
 {
 	//(x,y) is from the bottom left of the window
-	glColor3f(127./255.,127./255.,127./255.);
+	int *comp=complementary_color(atoi(xy_RGB[2]),atoi(xy_RGB[3]),atoi(xy_RGB[4]));
+	cout << comp[0] << " " << comp[1] << " " << comp[2] << endl;
+	glColor3f(comp[0]/255.,comp[1]/255.,comp[2]/255.);
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -200,12 +205,14 @@ void printtext(int x, int y, string String)
 	glPushMatrix();
 	glLoadIdentity();
 	glPushAttrib(GL_DEPTH_TEST);
+	
 	glDisable(GL_DEPTH_TEST);
 	glRasterPos2i(x,y);
 	for (int i=0; i<String.size(); i++)
 	{
 		//glutBitmapCharacter(GLUT_BITMAP_9_BY_15, String[i]);
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, String[i]);
+		//glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, String[i]);
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, String[i]);
 	}
 	glPopAttrib();
 	glMatrixMode(GL_PROJECTION);
@@ -222,18 +229,19 @@ void renderSceneLabels()
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
-	char temp[256];
+	char text1[256];
+	char text2[256];
+	char text3[256];
 	//empty or there is a constellation name ?
+	sprintf(text1,"%d\n",reader_universe.GetLinesRead());
+	printtext(5,WindowHeight/3,string(text1));
+	sprintf(text2,"%f , %f\n", reader_universe.GetLongitude(px),reader_universe.GetLatitude(py));
+	printtext(5,WindowHeight/4,string(text2));
 	if(name_const != "")
-		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°  / Constellation name : %s ",
-				reader_universe.GetLinesRead(), reader_universe.GetLongitude(px),
-				reader_universe.GetLongitude(py),name_const.c_str());
-	else
-		sprintf(temp,"Pixel %d / Galactic coordinates \t %f , %f",
-				reader_universe.GetLinesRead(),
-				reader_universe.GetLongitude(px),reader_universe.GetLongitude(py));
-	string sentence = string(temp);
-	printtext(5,10,sentence);
+	{
+	sprintf(text3,"%s",name_const.c_str());
+	printtext(5,WindowHeight/5,string(text3));
+	}
 	glutSwapBuffers();
 }
 /* ************************* */   
