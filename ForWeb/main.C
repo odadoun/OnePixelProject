@@ -20,6 +20,12 @@ int WindowWidth = 400;
 void signalHandler(int signum);
 void GetRGBUniverse();
 /* ************************* */
+/* ************************* */
+/* Force the rand to be egal according to linux, Arduino, mac os what ever platform
+ * see http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf for explanation */
+unsigned long my_rand(void);
+void my_srand(unsigned long seed);
+/* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
@@ -31,10 +37,15 @@ int main(int argc, char **argv)
 {
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
+	my_srand(65);
 	while(1) {
 		microseconds = (1000+rand()%2000)*1000;
 		cout << microseconds << endl;
-		usleep(microseconds);
+		unsigned long  init_start = 2000000;
+		unsigned long my_microseconds=init_start+(unsigned int)(my_rand()*2*init_start)/32768;
+		microseconds=my_microseconds;
+		cout << " my " << my_microseconds<< endl;
+		usleep(my_microseconds);
 		GetRGBUniverse();
 	}	
 		return 0;
@@ -111,22 +122,17 @@ void GetRGBUniverse()
 	sprintf(nb_read,"%lu",n);
 	replace_by[2]=to_string(n);
 	replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
-		
+        		
 	if(name_const != "")
 	{
 	 replace_by[4]="Constellation name :";
- 	 replace_by[5]=name_const;	 
-//		replace_by[4]="Pixel " + to_string(n) + " / Galactic coordinates " + 
-//		to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py))
-//		+ " / Constellation name : "+name_const;
+	 replace_by[5]=name_const;
 	}
 	else
 	{
-		replace_by[4]="";	
-		replace_by[5]="";
-	}
-		//replace_by[4]="Pixel " + to_string(n) + " / Galactic coordinates " +
-	//                to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));	
+	replace_by[4]="";
+	replace_by[5]="";	
+	}	
 	string to_replace[]={"TEMPLATE_TIME","TEMPLATE_RGB","TEMPLATE_PIXEL","TEMPLATE_COORD","APPEAR_OR_NOT","TEMPLATE_LABEL"};
 	html.open("faune.html");
 	while (getline(html_template, line))
@@ -144,6 +150,24 @@ void GetRGBUniverse()
 	cout << "Tot bytes : "     << tot_bytes << endl;
 	cout << "Constellation name  : " << name_const << endl;
 	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+
+// to provide an output easely ./reader 2>toto
+#if 0
+replace_by[4]="Constellation name :";
+cerr << "Pixel \t " << n << endl;
+cerr << "Galactic coordinates: \t"<< reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+cerr << "Constellation name : \t "<< name_const << "\n" << endl;
+#endif
 }
 /* ************************* */
+/* ************************* */
+static unsigned long int my_next = 1;
+unsigned long my_rand(void) // RAND_MAX assumed to be 32767
+{
+	 my_next = my_next * 1103515245 + 12345;
+	  return (unsigned long)(my_next/65536) % 32768;
+}
+void my_srand(unsigned long seed) {
+	        my_next=seed;
+}
 /* ************************* */   
