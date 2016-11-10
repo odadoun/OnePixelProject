@@ -11,7 +11,7 @@
 #include <GL/glut.h>
 #include <GL/freeglut.h>
 #include <unistd.h>
-
+#include <ctime>
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
@@ -21,7 +21,9 @@ int WindowWidth = 400;
 /* ************************* */
 void signalHandler(int signum);
 void GetRGBUniverse();
-void timer(int value);
+void ReadLastLine();
+void idle(void);
+void calculateTime();
 void printtext(int x, int y, string String);
 void renderSceneLabels();
 void renderScene();
@@ -32,24 +34,26 @@ void renderScene();
 static unsigned long int my_next = 1;
 int my_rand(void);
 void my_srand(unsigned int seed);
-unsigned int init_start = 2000000;
-unsigned int my_microseconds;
+unsigned int init_start = 1000000;
+int currentTime = 0;
+int previousTime = 0;
+unsigned int my_milliseconds;
+int milliseconds = 0;
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
-bool position_defined = false;
 int window_labels, window1, window2;  
 /* ************************* */
 int main(int argc, char **argv)
 {
-	
+	//start to read the last line in llr
+	ReadLastLine();
+        my_srand(12);	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
-        my_srand(65);	
 	glutInitWindowSize(WindowWidth,WindowHeight);
 	glutInitWindowPosition(WindowWidth/2, WindowHeight/2);
-	//glutTimerFunc( 0, timer, 0 );
 	window_labels=glutCreateWindow("One Pixel Universe labels");
 	glutDisplayFunc(renderSceneLabels);
 
@@ -63,8 +67,8 @@ int main(int argc, char **argv)
 	window2=glutCreateWindow("One Pixel Universe (2)");
 	glutDisplayFunc(renderScene);
 
-	glutTimerFunc( 0, timer, 0 );
-	
+	glutIdleFunc(idle);
+	//  Start GLUT event processing loop
 	glutMainLoop();
 	
 	return 0;
@@ -80,38 +84,37 @@ void signalHandler(int signum)
 	last_line_read.open("llr",ios::out);
 	last_line_read << reader_universe.GetLinesRead();
 	last_line_read.close();
-	// cleanup and close up stuff here  
-	// terminate program  
+	// cleanup and close up stuff here, terminate program  
 	exit(signum);  
 }
 /* ************************* */
+/* Read and/or Save last line read */
+void ReadLastLine()
+{
+ unsigned long int line_position;
+ last_line_read.open("llr",ios::in);
+ if (last_line_read.is_open())
+ {
+   last_line_read >> line_position;
+   last_line_read.close();
+  }
+  else
+  line_position=0;
+  unsigned long int bytes_read=reader_universe.injection(line_position);
+  reader_universe.SetLinesRead(line_position);
+  reader_universe.SetBytesRead(bytes_read);
+  cout << " From the last line read, start @ line " << line_position
+       << " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
+}
+
+/* ************************* */
 void GetRGBUniverse()
 {
-	if(position_defined == false) 
-	{
-		unsigned long int line_position;
-		last_line_read.open("llr",ios::in);
-		if (last_line_read.is_open())
-		{
-			last_line_read >> line_position;
-			last_line_read.close();
-		}
-		else 
-			line_position=0;
-		unsigned long int bytes_read=reader_universe.injection(line_position);	
-		reader_universe.SetLinesRead(line_position);
-		reader_universe.SetBytesRead(bytes_read);
-		cout << " From the last line read, start @ line " << line_position 
-			<< " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
-		position_defined=true;
-	}
 	reader_universe.fill_sequence_online(xy_RGB);
-
 	for(int i=0;i<=4;i++)
 	{
 		cout << " xy RGB values : " << xy_RGB[i] << endl;
 	}
-
 	unsigned long int n=reader_universe.GetLinesRead();
 	unsigned long int tot_bytes=reader_universe.GetBytesRead();
 
@@ -121,37 +124,32 @@ void GetRGBUniverse()
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
 	cout << "Constellation name  : " << name_const << endl;
-	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
-	cout << " **** **** " << endl;
-
+	cout << "Galactic coordinates "  <<  reader_universe.GetLongitude(px) << " "
+	     << reader_universe.GetLatitude(py) << endl;
+	cout << " **** **** " << milliseconds << endl;
 }
 /* ************************* */
-void timer(int value)
+void idle(void)
 {
-
-	//changeColor?
+        cout << " TOTOT 1" << endl;
+	my_milliseconds=init_start+init_start*(my_rand()/32768.);
+        cout << " TOTOT " << my_milliseconds << endl;
+	usleep(my_milliseconds);
 	GetRGBUniverse();
+        calculateTime();
+	cout << " TOTOT 3" << endl;
 	colorR = (atoi(xy_RGB[2])/255.);
 	colorG = (atoi(xy_RGB[3])/255.);
 	colorB = (atoi(xy_RGB[4])/255.);
-	if (colorR > 1.0)
-		colorR = 0;
-	if (colorG > 1.0)
-		colorG = 0;
-	if (colorB > 1.0)
-		colorB = 0;
-
+	if (colorR > 1.0) colorR = 0;
+	if (colorG > 1.0) colorG = 0;
+	if (colorB > 1.0) colorB = 0;
+	
 	glutPostRedisplay();
-	int time_random;
-	time_random = 10 + rand()%2000;
         
-	cout << " Time random " << time_random << endl;
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
-
-	my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;	
-	time_random=int(my_microseconds/1000);
-	cerr << "Dodo time  " << time_random << endl;  
+ 	
 	glutSetWindow(window_labels);
 	glutPostRedisplay();  // Update screen label
 		 
@@ -160,9 +158,33 @@ void timer(int value)
 	
 	glutSetWindow(window2);
 	glutPostRedisplay();  // Update screen 2
-	
-	// Not enough precision
-	glutTimerFunc( time_random, timer, 0 );
+}
+void calculateTime()
+{
+    //  Get the number of milliseconds since glutInit called 
+    //  (or first call to glutGet(GLUT ELAPSED TIME)).
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+
+    //  Calculate time passed
+    int timeInterval = currentTime - previousTime;
+    milliseconds = timeInterval;
+    previousTime = currentTime;    
+
+    if(timeInterval > 1000)  previousTime = currentTime;
+    else previousTime=1000;
+    
+ /* if(timeInterval > 1000)
+    {
+        //  calculate the number of frames per second
+        milliseconds = timeInterval;//frameCount / (timeInterval / 1000.0f);
+
+        //  Set time
+        previousTime = currentTime;
+
+        //  Reset frame count
+        frameCount = 0;
+    }
+    */
 }
 /* ************************* */   
 void printtext(int x, int y, string String)
@@ -194,20 +216,18 @@ void printtext(int x, int y, string String)
 /* ************************* */   
 void renderSceneLabels()
 {
-	cout << " renderSceneLabels" << colorR << " " << colorG <<  " " << colorB << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(colorR, colorG, colorB);
 	glRectf(-1.f,1.f, 1.f, -1.f);
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
-	//cout << name_const.size() << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
 	char temp[256];
 	//empty or there is a constellation name ?
 	if(name_const != "")
 		sprintf(temp,"Pixel %d / Galactic coordinates \t %f° , %f°  / Constellation name : %s ",
-				reader_universe.GetLinesRead(),
-				reader_universe.GetLongitude(px),reader_universe.GetLongitude(py),name_const.c_str());
+				reader_universe.GetLinesRead(), reader_universe.GetLongitude(px),
+				reader_universe.GetLongitude(py),name_const.c_str());
 	else
 		sprintf(temp,"Pixel %d / Galactic coordinates \t %f , %f",
 				reader_universe.GetLinesRead(),
@@ -219,7 +239,6 @@ void renderSceneLabels()
 /* ************************* */   
 void renderScene()
 {
-	cout << " renderScene" << colorR << " " << colorG <<  " " << colorB << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(colorR, colorG, colorB);
 	glRectf(-1.f,1.f, 1.f, -1.f);
@@ -228,10 +247,11 @@ void renderScene()
 /* ************************* */
 int my_rand(void) // RAND_MAX assumed to be 32767
 {
-	         my_next = my_next * 1103515245 + 12345;
-		           return (unsigned int)(my_next/65536) % 32768;
+ my_next = my_next * 1103515245 + 12345;
+ return (unsigned int)(my_next/65536) % 32768;
 }
-void my_srand(unsigned int seed) {
-	                my_next=seed;
+void my_srand(unsigned int seed) 
+{
+ my_next=seed;
 }
 /* ************************* */
