@@ -27,7 +27,7 @@ void GetRGBUniverse();
 static unsigned long int my_next = 1;
 int my_rand(void);
 void my_srand(unsigned int seed);
-unsigned int init_start = 2000000;
+unsigned int init_start = 1000000;
 unsigned int my_microseconds;
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
@@ -41,16 +41,12 @@ int main(int argc, char **argv)
 {
 	reader_universe.load_constellations_abacus();
 	signal(SIGINT, signalHandler);
-	my_srand(65);
+	my_srand(12);
 	while(1) {
-		microseconds = (1000+rand()%2000)*1000;
-		cout << microseconds << endl;
 		my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;
 		//Due to ms time pause in opengl this is a good trick
-		microseconds=floor(my_microseconds/1000)*1000;
-	        microseconds=my_microseconds;
-		cout << " my " << microseconds << endl;
-		usleep(microseconds);
+		cerr << " my " << my_microseconds << endl;
+		usleep(my_microseconds);
 		GetRGBUniverse();
 	}	
 		return 0;
@@ -168,10 +164,12 @@ cerr << "Constellation name : \t "<< name_const << "\n" << endl;
 /* ************************* */
 int my_rand(void) // RAND_MAX assumed to be 32767
 {
-	 my_next = my_next * 1103515245 + 12345;
-	  return (unsigned int)(my_next/65536) % 32768;
+ my_next = my_next * 1103515245 + 12345;
+ return (unsigned int)(my_next/65536) % 32768;
 }
-void my_srand(unsigned int seed) {
-	        my_next=seed;
+/* ************************* */
+void my_srand(unsigned int seed) 
+{
+ my_next=seed;
 }
 /* ************************* */   
