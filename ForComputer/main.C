@@ -26,6 +26,15 @@ void printtext(int x, int y, string String);
 void renderSceneLabels();
 void renderScene();
 /* ************************* */
+/* Force the rand to be egal according to linux, Arduino, mac os what ever platform */
+/* see Pseudo-random sequence generation functions */
+/* in http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf for explanation */
+static unsigned long int my_next = 1;
+int my_rand(void);
+void my_srand(unsigned int seed);
+unsigned int init_start = 2000000;
+unsigned int my_microseconds;
+/* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
@@ -34,15 +43,13 @@ int window_labels, window1, window2;
 /* ************************* */
 int main(int argc, char **argv)
 {
-	reader_universe.load_constellations_abacus();
-	signal(SIGINT, signalHandler);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
-	
+        my_srand(65);	
 	glutInitWindowSize(WindowWidth,WindowHeight);
 	glutInitWindowPosition(WindowWidth/2, WindowHeight/2);
-	glutTimerFunc( 0, timer, 0 );
+	//glutTimerFunc( 0, timer, 0 );
 	window_labels=glutCreateWindow("One Pixel Universe labels");
 	glutDisplayFunc(renderSceneLabels);
 
@@ -59,6 +66,7 @@ int main(int argc, char **argv)
 	glutTimerFunc( 0, timer, 0 );
 	
 	glutMainLoop();
+	
 	return 0;
 }
 /* ************************* */
@@ -114,15 +122,18 @@ void GetRGBUniverse()
 	string name_const = reader_universe.return_constellation(px,py);
 	cout << "Constellation name  : " << name_const << endl;
 	cout << "Galactic coordinates "   <<  reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
+	cout << " **** **** " << endl;
+
 }
 /* ************************* */
 void timer(int value)
 {
+
 	//changeColor?
 	GetRGBUniverse();
-	colorR = atof(xy_RGB[2])/255.;
-	colorG = atof(xy_RGB[3])/255.;
-	colorB = atof(xy_RGB[4])/255.;
+	colorR = (atoi(xy_RGB[2])/255.);
+	colorG = (atoi(xy_RGB[3])/255.);
+	colorB = (atoi(xy_RGB[4])/255.);
 	if (colorR > 1.0)
 		colorR = 0;
 	if (colorG > 1.0)
@@ -132,9 +143,15 @@ void timer(int value)
 
 	glutPostRedisplay();
 	int time_random;
-	time_random = 10 + rand()%1000;
+	time_random = 10 + rand()%2000;
+        
 	cout << " Time random " << time_random << endl;
-	
+	reader_universe.load_constellations_abacus();
+	signal(SIGINT, signalHandler);
+
+	my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;	
+	time_random=int(my_microseconds/1000);
+	cerr << "Dodo time  " << time_random << endl;  
 	glutSetWindow(window_labels);
 	glutPostRedisplay();  // Update screen label
 		 
@@ -144,6 +161,7 @@ void timer(int value)
 	glutSetWindow(window2);
 	glutPostRedisplay();  // Update screen 2
 	
+	// Not enough precision
 	glutTimerFunc( time_random, timer, 0 );
 }
 /* ************************* */   
@@ -206,5 +224,14 @@ void renderScene()
 	glColor3f(colorR, colorG, colorB);
 	glRectf(-1.f,1.f, 1.f, -1.f);
 	glutSwapBuffers();
+}
+/* ************************* */
+int my_rand(void) // RAND_MAX assumed to be 32767
+{
+	         my_next = my_next * 1103515245 + 12345;
+		           return (unsigned int)(my_next/65536) % 32768;
+}
+void my_srand(unsigned int seed) {
+	                my_next=seed;
 }
 /* ************************* */
