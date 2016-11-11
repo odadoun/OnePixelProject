@@ -18,6 +18,7 @@ int WindowHeight = 400;
 int WindowWidth = 400;
 /* ************************* */
 void signalHandler(int signum);
+void ReadLastLine();
 void GetRGBUniverse();
 /* ************************* */
 /* ************************* */
@@ -27,29 +28,27 @@ void GetRGBUniverse();
 static unsigned long int my_next = 1;
 int my_rand(void);
 void my_srand(unsigned int seed);
-unsigned int init_start = 1000000;
+unsigned int init_start_us = 2000000;
 unsigned int my_microseconds;
 /* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
 bool position_defined = false;
-//unsigned int microseconds;
-useconds_t microseconds;
 /* ************************* */
 int main(int argc, char **argv)
 {
 	reader_universe.load_constellations_abacus();
+	ReadLastLine();
 	signal(SIGINT, signalHandler);
 	my_srand(12);
 	while(1) {
-		my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;
+		my_microseconds=init_start_us+(unsigned int)(my_rand()*init_start_us)/32768;
 		//Due to ms time pause in opengl this is a good trick
-		cerr << " my " << my_microseconds << endl;
 		usleep(my_microseconds);
 		GetRGBUniverse();
 	}	
-		return 0;
+	return 0;
 }
 /* ************************* */
 /* ************************* */
@@ -67,7 +66,7 @@ void signalHandler(int signum)
 	exit(signum);  
 }
 /* ************************* */
-void GetRGBUniverse()
+void ReadLastLine()
 {
 	if(position_defined == false) 
 	{
@@ -87,6 +86,10 @@ void GetRGBUniverse()
 			<< " bytes already readed  " <<  reader_universe.GetBytesRead() << endl;
 		position_defined=true;
 	}
+}
+/* ************************* */
+void GetRGBUniverse()
+{
 	reader_universe.fill_sequence_online(xy_RGB);
 
 	for(int i=0;i<=4;i++)
@@ -114,10 +117,10 @@ void GetRGBUniverse()
 
 	string line;
 	char char_microseconds[256];
-	sprintf(char_microseconds,"%d",microseconds/1000);
+	sprintf(char_microseconds,"%d",my_microseconds/1000);
 	string replace_by[6];	
 	replace_by[0]=string(char_microseconds);
-	cout << " replace " << replace_by[1] << endl;
+	cout << " ---->replace " << replace_by[0] << endl;
 	replace_by[1]="rgb("+string(xy_RGB[2])+","+string(xy_RGB[3])+","+string(xy_RGB[4])+")";
 	char nb_read[256];
 	sprintf(nb_read,"%lu",n);
@@ -140,7 +143,7 @@ void GetRGBUniverse()
 	{
 		for(int i=0;i<6;i++)
 		{
-	 	size_t len = to_replace[i].length();
+		size_t len = to_replace[i].length();
 		size_t pos = line.find(to_replace[i]);
 		if (pos != string::npos) line.replace(pos, len, replace_by[i]); 
 		}
