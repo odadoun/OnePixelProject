@@ -146,6 +146,7 @@ void GetRGBUniverse()
 void Dodo()
 {
 	gettimeofday(&te_current, NULL);
+        rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 	deltatime.tv_sec = 1;//rand_microseconds;
 	add_milli = rand_milliseconds;//need ms and not mus
 	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
@@ -160,12 +161,11 @@ void Dodo()
 	long long milliseconds_current = te_current.tv_sec*1000LL + te_current.tv_usec/1000;
 	cout << "TIME " << milliseconds_current << endl;
 	calculateTime();
-	//cerr << rand_milliseconds  << " and " << micro_chronos << endl;
+	cerr << rand_milliseconds  << endl;//" and " << micro_chronos << endl;
 }
 /* ************************* */
 void idle(void)
 {
-	rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 	GetRGBUniverse();
 	Dodo();
 	colorR = (atoi(xy_RGB[2])/255.);
