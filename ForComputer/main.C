@@ -143,7 +143,7 @@ void Dodo()
 	gettimeofday(&te_current, NULL);
         rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 	deltatime.tv_sec = 1;//rand_microseconds;
-	add_milli = rand_milliseconds;//need ms and not mus
+	add_milli = 500;//rand_milliseconds;//need ms and not mus
 	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
 	
 	struct timeval endtime;
