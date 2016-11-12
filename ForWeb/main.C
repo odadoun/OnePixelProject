@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
+#include <sys/time.h>
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
@@ -31,6 +32,14 @@ void my_srand(unsigned int seed);
 unsigned int init_start_us = 2000000;
 unsigned int my_microseconds;
 /* ************************* */
+void Dodo();
+unsigned long max_rand_mseconds = 900;
+struct timeval te_beginning;
+struct timeval te_current;
+struct timeval deltatime;
+unsigned long rand_milliseconds;
+unsigned add_milli=0;
+/* ************************* */
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
@@ -40,12 +49,14 @@ int main(int argc, char **argv)
 {
 	reader_universe.load_constellations_abacus();
 	ReadLastLine();
+	gettimeofday(&te_beginning, NULL); // get current time
 	signal(SIGINT, signalHandler);
 	my_srand(12);
 	while(1) {
-		my_microseconds=init_start_us+(unsigned int)(my_rand()*init_start_us)/32768;
+		rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 		//Due to ms time pause in opengl this is a good trick
-		usleep(my_microseconds);
+		Dodo();
+		//usleep(my_microseconds);
 		GetRGBUniverse();
 	}	
 	return 0;
@@ -117,15 +128,17 @@ void GetRGBUniverse()
 
 	string line;
 	char char_microseconds[256];
-	sprintf(char_microseconds,"%d",my_microseconds/1000);
-	string replace_by[6];	
+	sprintf(char_microseconds,"%d",int(1000+rand_milliseconds));
+	string replace_by[6];
+		
 	replace_by[0]=string(char_microseconds);
 	cout << " ---->replace " << replace_by[0] << endl;
 	replace_by[1]="rgb("+string(xy_RGB[2])+","+string(xy_RGB[3])+","+string(xy_RGB[4])+")";
 	char nb_read[256];
 	sprintf(nb_read,"%lu",n);
 	replace_by[2]=to_string(n);
-	replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
+	//replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
+	replace_by[3]=to_string(rand_milliseconds) + " , " + to_string(reader_universe.GetLatitude(py));
         		
 	if(name_const != "")
 	{
@@ -162,6 +175,26 @@ cerr << "Pixel \t " << n << endl;
 cerr << "Galactic coordinates: \t"<< reader_universe.GetLongitude(px) << " " << reader_universe.GetLatitude(py) << endl;
 cerr << "Constellation name : \t "<< name_const << "\n" << endl;
 #endif
+}
+/* ************************* */
+void Dodo()
+{
+        gettimeofday(&te_current, NULL);
+
+        deltatime.tv_sec = 1;//rand_microseconds;
+        add_milli = rand_milliseconds;//need ms and not mus
+	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
+	//long long microseconds_beginning
+	//= te_beginning.tv_sec*1000LL + te_beginning.tv_usec/1000+te_beginning.tv_usec;
+
+        struct timeval endtime;
+        timeradd(&te_current, &deltatime, &endtime);
+
+        while (timercmp(&te_current, &endtime, <)) {
+                    gettimeofday(&te_current, NULL);
+        }
+        te_current=te_beginning;
+	cerr << rand_milliseconds  << endl;
 }
 /* ************************* */
 /* ************************* */
