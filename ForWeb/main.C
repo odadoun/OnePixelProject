@@ -140,7 +140,7 @@ void GetRGBUniverse()
         		
 	if(name_const != "")
 	{
-	 replace_by[4]="Constellation name :";
+	 replace_by[4]="";
 	 replace_by[5]=name_const;
 	}
 	else
