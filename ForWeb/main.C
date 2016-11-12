@@ -127,7 +127,7 @@ void GetRGBUniverse()
 
 	string line;
 	char char_microseconds[256];
-	sprintf(char_microseconds,"%d",int(1000));//+rand_milliseconds));
+	sprintf(char_microseconds,"%d",int(1000+rand_milliseconds));
 	string replace_by[6];
 		
 	replace_by[0]=string(char_microseconds);
@@ -187,7 +187,8 @@ void Dodo()
 	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
 	//long long microseconds_beginning
 	//= te_beginning.tv_sec*1000LL + te_beginning.tv_usec/1000+te_beginning.tv_usec;
-
+	
+	rand_milliseconds=add_milli;
         struct timeval endtime;
         timeradd(&te_current, &deltatime, &endtime);
 
