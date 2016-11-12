@@ -14,6 +14,7 @@
 #include <GL/freeglut.h>
 #include <unistd.h>
 #include <ctime>
+#include <sys/time.h>
 /* For OpenGL Utility Toolkit (GLUT) */
 float colorR = 0.0f;
 float colorG = 0.0f;
@@ -37,8 +38,7 @@ void renderScene();
 static unsigned long int my_next = 1;
 int my_rand(void);
 void my_srand(unsigned int seed);
-unsigned int my_microseconds = 0;
-unsigned int init_start = 1000000;
+unsigned int max_rand_mseconds = 900;
 int currentTime = 0;
 int previousTime = 0;
 int micro_chronos = 0;
@@ -48,11 +48,22 @@ char xy_RGB[5][64];
 fstream last_line_read;
 int window_labels, window1, window2;  
 /* ************************* */
+struct timeval te_beginning;
+struct timeval te_current;
+struct timeval deltatime;
+unsigned int rand_milliseconds;
+unsigned add_milli=0;
+/* ************************* */
+void Dodo();
+/* ************************* */
 int main(int argc, char **argv)
 {
 	//start to read the last line in llr
 	ReadLastLine();
-    my_srand(12);
+    gettimeofday(&te_beginning, NULL); // get current time
+	// long long microseconds_beginning = 
+	// te_beginning.tv_sec*1000LL + te_beginning.tv_usec/1000+te_beginning.tv_usec;
+	my_srand(12);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WindowWidth,WindowHeight);
@@ -129,16 +140,34 @@ void GetRGBUniverse()
 	cout << "Constellation name  : " << name_const << endl;
 	cout << "Galactic coordinates "  <<  reader_universe.GetLongitude(px) << " "
 	     << reader_universe.GetLatitude(py) << endl;
-	cout << " **** **** " << my_microseconds << endl;
+	cout << " **** ****\n" << endl;
+}
+/* ************************* */
+void Dodo()
+{
+	gettimeofday(&te_current, NULL);
+	deltatime.tv_sec = 1;//rand_microseconds;
+	add_milli = rand_milliseconds;//need ms and not mus
+	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
+	
+	struct timeval endtime;
+	timeradd(&te_current, &deltatime, &endtime);
+       
+	while (timercmp(&te_current, &endtime, <)) {
+		    gettimeofday(&te_current, NULL);
+	}
+	te_current=te_beginning;	
+	long long milliseconds_current = te_current.tv_sec*1000LL + te_current.tv_usec/1000;
+	cout << "TIME " << milliseconds_current << endl;
+	calculateTime();
+	//cerr << rand_milliseconds  << " and " << micro_chronos << endl;
 }
 /* ************************* */
 void idle(void)
 {
-	my_microseconds=init_start+(unsigned int)(my_rand()*init_start)/32768;
-    cerr<< " Micro DODO " << my_microseconds << endl;
-	usleep(my_microseconds);
+	rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 	GetRGBUniverse();
-        calculateTime();
+	Dodo();
 	colorR = (atoi(xy_RGB[2])/255.);
 	colorG = (atoi(xy_RGB[3])/255.);
 	colorB = (atoi(xy_RGB[4])/255.);
@@ -194,19 +223,17 @@ void printtext(int x, int y, string String)
 {
 	//(x,y) is from the bottom left of the window
 	int *comp=complementary_color(atoi(xy_RGB[2]),atoi(xy_RGB[3]),atoi(xy_RGB[4]));
-	cout << comp[0] << " " << comp[1] << " " << comp[2] << endl;
 	glColor3f(comp[0]/255.,comp[1]/255.,comp[2]/255.);
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
-	glLoadIdentity();
+	//glLoadIdentity();
 	glOrtho(0, WindowWidth, 0, WindowHeight, -1.0f, 1.0f);
 	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glPushAttrib(GL_DEPTH_TEST);
-	
-	glDisable(GL_DEPTH_TEST);
+	//glPushMatrix();
+	//glLoadIdentity();
+	//glPushAttrib(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	glRasterPos2i(x,y);
 	for (int i=0; i<String.size(); i++)
 	{
@@ -229,10 +256,15 @@ void renderSceneLabels()
 	unsigned long int px=strtoul(xy_RGB[0],NULL,0);
 	unsigned long int py=strtoul(xy_RGB[1],NULL,0);
 	string name_const = reader_universe.return_constellation(px,py);
+	char text0[256];
 	char text1[256];
 	char text2[256];
 	char text3[256];
 	//empty or there is a constellation name ?
+	
+	sprintf(text0,"%d\n",rand_milliseconds);
+	printtext(5,WindowHeight/2,string(text0));
+
 	sprintf(text1,"%d\n",reader_universe.GetLinesRead());
 	printtext(5,WindowHeight/3,string(text1));
 	sprintf(text2,"%f , %f\n", reader_universe.GetLongitude(px),reader_universe.GetLatitude(py));
@@ -263,3 +295,4 @@ void my_srand(unsigned int seed)
  my_next=seed;
 }
 /* ************************* */
+
