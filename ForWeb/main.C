@@ -136,8 +136,7 @@ void GetRGBUniverse()
 	char nb_read[256];
 	sprintf(nb_read,"%lu",n);
 	replace_by[2]=to_string(n);
-	//replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
-	replace_by[3]=to_string(rand_milliseconds) + " , " + to_string(reader_universe.GetLatitude(py));
+	replace_by[3]=to_string(reader_universe.GetLongitude(px)) + " , " + to_string(reader_universe.GetLatitude(py));
         		
 	if(name_const != "")
 	{
