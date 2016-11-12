@@ -53,7 +53,6 @@ int main(int argc, char **argv)
 	signal(SIGINT, signalHandler);
 	my_srand(12);
 	while(1) {
-		rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
 		//Due to ms time pause in opengl this is a good trick
 		Dodo();
 		//usleep(my_microseconds);
@@ -179,8 +178,10 @@ cerr << "Constellation name : \t "<< name_const << "\n" << endl;
 /* ************************* */
 void Dodo()
 {
-        gettimeofday(&te_current, NULL);
+        
+	gettimeofday(&te_current, NULL);
 
+        rand_milliseconds=(unsigned int)(my_rand()*max_rand_mseconds)/32768;
         deltatime.tv_sec = 1;//rand_microseconds;
         add_milli = rand_milliseconds;//need ms and not mus
 	deltatime.tv_usec = add_milli*1000;//rand_milliseconds*1000;
