@@ -27,8 +27,8 @@ void GetRGBUniverse();
 void ReadLastLine();
 void idle(void);
 void calculateTime();
-int *complementary_color(int r,int g,int b);
-void printtext(int x, int y, string String);
+float *complementary_color(int r,int g,int b);
+void printtext(int x, int y, string String,bool legend);
 void renderSceneLabels();
 void renderScene();
 /* ************************* */
@@ -46,7 +46,7 @@ int micro_chronos = 0;
 TheReaderUniverse reader_universe("onepixel.txt");
 char xy_RGB[5][64];
 fstream last_line_read;
-int window_labels, window1, window2;  
+int window_labels, window;  
 /* ************************* */
 struct timeval te_beginning;
 struct timeval te_current;
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 {
 	//start to read the last line in llr
 	ReadLastLine();
-    gettimeofday(&te_beginning, NULL); // get current time
+        gettimeofday(&te_beginning, NULL); // get current time
 	// long long microseconds_beginning = 
 	// te_beginning.tv_sec*1000LL + te_beginning.tv_usec/1000+te_beginning.tv_usec;
 	my_srand(12);
@@ -73,14 +73,9 @@ int main(int argc, char **argv)
 
 	glutInitWindowSize(WindowWidth,WindowHeight);
 	glutInitWindowPosition(WindowWidth, WindowHeight);
-	window1=glutCreateWindow("One Pixel Universe (1)");
+	window=glutCreateWindow("One Pixel Universe");
 	glutDisplayFunc(renderScene);
 	
-	glutInitWindowSize(WindowWidth,WindowHeight);
-	glutInitWindowPosition(WindowWidth*2, WindowHeight*2);
-	window2=glutCreateWindow("One Pixel Universe (2)");
-	glutDisplayFunc(renderScene);
-
 	glutIdleFunc(idle);
 	//  Start GLUT event processing loop
 	glutMainLoop();
@@ -183,11 +178,9 @@ void idle(void)
 	glutSetWindow(window_labels);
 	glutPostRedisplay();  // Update screen label
 		 
-	glutSetWindow(window1);
+	glutSetWindow(window);
 	glutPostRedisplay();  // Update screen 1
 	
-	glutSetWindow(window2);
-	glutPostRedisplay();  // Update screen 2
 }
 void calculateTime()
 {
@@ -210,20 +203,20 @@ void calculateTime()
         previousTime = currentTime;
     }
 }
-int *complementary_color(int r,int g,int b)
+float *complementary_color(int r,int g,int b)
 {
-	int *array= new int[3];
-	array[0]=255-r;
-	array[1]=255-g;
-	array[2]=255-b;
+	float *array= new float[3];
+	array[0]=(255.-(float)r)/255.;
+	array[1]=(255-(float)g)/255.;
+	array[2]=(255-(float)b)/255.;
 	return array;
 }
 /* ************************* */   
-void printtext(int x, int y, string String)
+void printtext(int x, int y, string String,bool legend)
 {
 	//(x,y) is from the bottom left of the window
-	int *comp=complementary_color(atoi(xy_RGB[2]),atoi(xy_RGB[3]),atoi(xy_RGB[4]));
-	glColor3f(comp[0]/255.,comp[1]/255.,comp[2]/255.);
+ 	float *comp=complementary_color(atoi(xy_RGB[2]),atoi(xy_RGB[3]),atoi(xy_RGB[4]));
+	glColor3f(comp[0],comp[1],comp[2]);
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -238,8 +231,10 @@ void printtext(int x, int y, string String)
 	for (int i=0; i<String.size(); i++)
 	{
 		//glutBitmapCharacter(GLUT_BITMAP_9_BY_15, String[i]);
-		//glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, String[i]);
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, String[i]);
+		if(legend==true)
+		    	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, String[i]);   	
+		else
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, String[i]);
 	}
 	glPopAttrib();
 	glMatrixMode(GL_PROJECTION);
@@ -258,21 +253,29 @@ void renderSceneLabels()
 	string name_const = reader_universe.return_constellation(px,py);
 	char text0[256];
 	char text1[256];
+	char text1legend[256];
 	char text2[256];
+	char text2legend[256];
 	char text3[256];
+	char text3legend[256];
 	//empty or there is a constellation name ?
 	
-	sprintf(text0,"%d\n",rand_milliseconds);
-	printtext(5,WindowHeight/2,string(text0));
-
+	//sprintf(text0,"%d\n",rand_milliseconds);
+	//printtext(5,WindowHeight/2,string(text0));
+	int position0=WindowHeight/3;
+	sprintf(text1legend,"Pixel #");
+	printtext(5,position0,string(text1legend),true);
 	sprintf(text1,"%d\n",reader_universe.GetLinesRead());
-	printtext(5,WindowHeight/3,string(text1));
+	printtext(5,position0-20,string(text1),false);
+	
+	sprintf(text2legend,"Galactic coordinates");
+	printtext(5,position0-40,string(text2legend),true);
 	sprintf(text2,"%f , %f\n", reader_universe.GetLongitude(px),reader_universe.GetLatitude(py));
-	printtext(5,WindowHeight/4,string(text2));
+	printtext(5,position0-60,string(text2),false);
 	if(name_const != "")
 	{
 	sprintf(text3,"%s",name_const.c_str());
-	printtext(5,WindowHeight/5,string(text3));
+	printtext(5,position0-80,string(text3),true);
 	}
 	glutSwapBuffers();
 }
