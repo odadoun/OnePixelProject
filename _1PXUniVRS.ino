@@ -49,7 +49,7 @@ long EEPROMReadlong(long address)
 long filePosition = EEPROMReadlong(0);
 
 TheReaderUniverse reader_universe;
-long int lastest_line_bytes[2];
+unsigned long lastest_line_bytes[2];
 
 void setup() {
   /*  Begin of testing and opening SD file   */
@@ -149,7 +149,7 @@ void loop() {
   delay(1000);
 }
 
-void EEPROMWritelong(int address, long value)
+void EEPROMWritelong(int address, unsigned long value)
 {
   //Decomposition from a long to 4 bytes by using bitshift.
   //One = Most significant -> Four = Least significant byte
