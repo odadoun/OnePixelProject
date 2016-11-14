@@ -25,7 +25,7 @@ body {
 		</head>
 		<body>
 	   <div class="element">
-           <div class="faunelegende">Pixel</div>
+           <div class="faunelegende">Pixel #</div>
            <div class="faunepixel">TEMPLATE_PIXEL</div>
            <div class="faunelegende">Galactic coordinates</div>
             <div class="faunecoord">TEMPLATE_COORD</div>
