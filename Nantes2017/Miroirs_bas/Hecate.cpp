@@ -14,9 +14,9 @@ Hecate::Hecate(String file_name):itsFileName(file_name),_i1(0),_i2(0)
 {
   Serial.println("Hecate Constructor, init Brains ...");
   Serial.println("Brains  attached : ");
-
+ 
   InitAttach();   
-  ExtractInfo(); 
+
 }
 
 Hecate::~Hecate(void)
@@ -55,13 +55,16 @@ void Hecate::SetStarsInConst(int _i2,int temp_i)
   nb_stars[_i2] = temp_i;
 }
 
-void Hecate::ExtractInfo()
+void Hecate::ExtractInfo(float (&xy)[2*NB_STARS_MAX], int nb)
 {
-  String temp;
+  String temp="";
   int nb_const=0;
+  
   int ii=0;
- 
+  char cool_chaine[64];
+  char char_xy[4][64];
   myFile = SD.open(itsFileName, FILE_READ);
+  
   if (!myFile)
   {
     Serial.println("**** ERROR MESSAGE ***");
@@ -73,7 +76,7 @@ void Hecate::ExtractInfo()
     Serial.print("File "); 
     Serial.print(itsFileName);
     Serial.println(" opened ...");
-    
+
     while (myFile.available())
     {
       temp = myFile.readStringUntil('\n');
@@ -81,54 +84,15 @@ void Hecate::ExtractInfo()
       {
         if (isAlpha(temp[0]))
         {
-         SetNameConst(nb_const,temp);
-         nb_const++;
-         ii=0;
-        }
-        else
-        {            
-          SetStarsInConst(nb_const-1,ii+1);      
-         ii++ ;           
-        }
-      }
-    }
-  }
-  Serial.println("ExtractInfo done !");
-  myFile.close();
-}
-
-
-void Hecate::Pioche(float (&xy)[2*NB_STARS_MAX], int nb)
-{
-  String temp;
-  int nb_const=0;
-  char cool_chaine[64];
-  int ii=0;
-  char char_xy[4][64];
-  myFile = SD.open(itsFileName, FILE_READ);
-
-  if (!myFile)
-  {
-    Serial.println("**** ERROR MESSAGE ***");
-    Serial.println(itsFileName);
-    Serial.println("doesn't exit ... check, exit now!");
-  }
-  else
-  {   
-   while (myFile.available())
-    {
-      temp = myFile.readStringUntil('\n');
-      
-      if (!temp.startsWith("#"))
-      {
-        if (isAlpha(temp[0]))
-        {
+        SetNameConst(nb_const,temp);
+        
          nb_const++;
          ii=0;
          if(nb_const-1 > nb  ) break; 
         }
         else
-        { 
+        {            
+         SetStarsInConst(nb_const-1,ii+1); 
          strcpy(cool_chaine, temp.c_str());
          column_extracter(cool_chaine,char_xy);
          if( nb_const-1  == nb )
@@ -137,12 +101,12 @@ void Hecate::Pioche(float (&xy)[2*NB_STARS_MAX], int nb)
            xy[2*ii]=atof(char_xy[2]); 
            xy[2*ii+1]=atof(char_xy[3]);
          }
-         ii++ ;           
+          ii++ ;           
         }
       }
     }
-  }
+  } 
+  Serial.println("ExtractInfo done !");
   myFile.close();
 }
-
 

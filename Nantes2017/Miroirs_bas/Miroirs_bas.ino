@@ -26,14 +26,18 @@ void setup() {
     hecate = new Hecate("starmap.txt");
    
    for(int i=0;i<NB_CONST;i++)
-    {   
+    { 
       int Nc=i;
+      float xy[2*NB_STARS_MAX];
+      
+      hecate->ExtractInfo(xy,Nc);  
+      
       int Ns=hecate->nb_stars[Nc]; 
       Serial.println(hecate->const_name[Nc]); 
       Serial.println(Ns);
-      float xy[2*NB_STARS_MAX];
-      hecate->Pioche(xy,Nc);  
-
+      
+      //hecate->Pioche(xy,Nc);  
+      
       for(int k=0 ; k < (hecate->nb_stars[Nc])*2 ;k++) 
       {
         if(k %2 == 0) {

@@ -39,7 +39,6 @@ class Hecate {
       Servo *GetVoCer() {return VoCer;}  
 
  private:
-    void ExtractInfo();
     int _i1;
     int _i2;
     void SetNameConst(int _i1, String temp_name); 
@@ -47,7 +46,7 @@ class Hecate {
 
     
 public:
-    void Pioche(float (&xy)[2*NB_STARS_MAX], int nb);
+    void ExtractInfo(float (&xy)[2*NB_STARS_MAX], int nb);
     String const_name[NB_CONST];
     int nb_stars[NB_CONST];
 
