@@ -10,7 +10,7 @@
 
 Hecate::Hecate()
 {;}
-Hecate::Hecate(String file_name):itsFileName(file_name),_i1(0),_i2(0)
+Hecate::Hecate(String file_name):itsFileName(file_name)
 {
   Serial.println("Hecate Constructor, init Brains ...");
   Serial.println("Brains  attached : ");
@@ -28,6 +28,33 @@ Hecate::~Hecate(void)
 void Hecate::InitAttach()
 {
   for (int i = 0; i < NUMBER_BRAINS; i++) VoCer[i].attach(init_pin[i]);
+}
+
+void Hecate::TestSynchronisation()
+{
+   for(int pos = 50; pos <= 130; pos += 1)
+    {
+      for(int i=0;i<NUMBER_BRAINS;i++)  GetVoCer()[i].write(pos);
+      delay(55);
+     }
+   for(int pos = 130; pos >= 50; pos -= 1)
+    {
+      for(int i=0;i<NUMBER_BRAINS;i++) GetVoCer()[i].write(pos);
+      delay(55);
+    }
+ }
+void Hecate::MotorAtRest()
+{
+  for(int i=0;i<NUMBER_BRAINS;i++) 
+  {
+        if(i%2==0)  GetVoCer()[i].write(90+ANGLE_MIROR);
+        else GetVoCer()[i].write(90);
+  }
+}
+void Hecate::initMotorAngle(int brain,int theta,int phi)
+{
+  GetVoCer()[2*brain].write(theta);
+  GetVoCer()[2*brain+1].write(phi);
 }
 
 void Hecate::column_extracter(char string_line[256], char (&_xy)[4][64])
