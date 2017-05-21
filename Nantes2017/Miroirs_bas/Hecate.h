@@ -16,7 +16,14 @@
 #define NB_STARS_MAX  25
 #define NB_CONST  45
 #define DISTANCE_WALL 3300
-#define ANGLE_MIROR 30
+#define ANGLE_MIROR 10
+
+#define amplitude_min_mirror_vertical 60
+#define amplitude_max_mirror_vertical 120
+
+
+#define amplitude_min_mirror_horizontal 20
+#define amplitude_max_mirror_horizontal 160
 
 class Hecate {
 

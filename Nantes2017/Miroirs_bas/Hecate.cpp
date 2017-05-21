@@ -16,7 +16,6 @@ Hecate::Hecate(String file_name):itsFileName(file_name)
   Serial.println("Brains  attached : ");
  
   InitAttach();   
-
 }
 
 Hecate::~Hecate(void)
@@ -32,16 +31,32 @@ void Hecate::InitAttach()
 
 void Hecate::TestSynchronisation()
 {
-   for(int pos = 50; pos <= 130; pos += 1)
+  
+   for(int pos = amplitude_min_mirror_vertical; pos <= amplitude_max_mirror_vertical; pos += 1)
     {
-      for(int i=0;i<NUMBER_BRAINS;i++)  GetVoCer()[i].write(pos);
-      delay(55);
+      for(int i=0;i<NUMBER_BRAINS;i++)  
+      {
+        if(i%2==0) 
+          GetVoCer()[i].write(pos);
+        else
+        GetVoCer()[i].write(90);
+      }
+      delay(35);
+      
      }
-   for(int pos = 130; pos >= 50; pos -= 1)
+     delay(2000);
+   for(int pos = amplitude_max_mirror_vertical; pos >= amplitude_min_mirror_vertical; pos -= 1)
     {
-      for(int i=0;i<NUMBER_BRAINS;i++) GetVoCer()[i].write(pos);
-      delay(55);
+    for(int i=0;i<NUMBER_BRAINS;i++)  
+      {
+        if(i%2==0) 
+          GetVoCer()[i].write(pos);
+        else
+        GetVoCer()[i].write(90);
+      }
+       delay(35);
     }
+    delay(2000);
  }
 void Hecate::MotorAtRest()
 {
