@@ -70,7 +70,7 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x04, 0x37 };
 // Set the static IP address to use if the DHCP fails to assign
 IPAddress IP(192, 168, 100, 100);
 const unsigned long requestInterval = 100;
-
+boolean test_connection = false;
 void setup() {
 
   randomSeed (analogRead(A0));
@@ -109,8 +109,10 @@ void setup() {
 
   lastest_line_bytes[0] = EEPROMReadlong(0);
   lastest_line_bytes[1] = EEPROMReadlong(4);
+
   reader_universe.SetLinesRead(lastest_line_bytes[0]);
   reader_universe.SetBytesRead(lastest_line_bytes[1]);
+
   /* loaded constellations names and position */
   reader_universe.load_constellations_abacus();
 
@@ -136,58 +138,68 @@ void setup() {
    Serial.print("My adress is :");
    Serial.println(Ethernet.localIP());
       
-   faune_xyz.connectToServer();
+   test_connection=faune_xyz.connectToServer();
 /****************************/ 
 }
 
 void loop() {
     unsigned long int pixel_number;
-    unsigned long int px;
-    unsigned long int py;
+    unsigned long int px=0;
+    unsigned long int py=0;
     int color_r;
     int color_g;
     int color_b;
+    String name_const;
 
     char input_string[256];
-    char line_xy_rgb[6][64];
-     
+    char line_bytes_xy_rgb[7][64];
+    
+
      /* Faune online stuff */ 
+
     if(faune_xyz.GetMessage().length() > 0 && faune_xyz.GetLecture()==false)
     {
-      Serial.print("je viens de recevoir un message : ");
-      Serial.println(faune_xyz.GetMessage());
+     // Serial.print("I have received this from the server ");
+     // Serial.println(faune_xyz.GetMessage());
       sprintf(input_string,"%s",(faune_xyz.GetMessage()).c_str());
-      faune_xyz.parse_web(input_string,line_xy_rgb);
-      Serial.println(line_xy_rgb[0]);
+      faune_xyz.parse_web(input_string,line_bytes_xy_rgb);
+      /*Serial.println(line_xy_rgb[0]);
       Serial.println(line_xy_rgb[1]);
       Serial.println(line_xy_rgb[2]);
       Serial.println(line_xy_rgb[3]);
       Serial.println(line_xy_rgb[4]);
-      Serial.println(line_xy_rgb[5]);
+      Serial.println(line_xy_rgb[5]);*/
+      pixel_number=strtoul(line_bytes_xy_rgb[0], NULL, 0);
+      px=strtoul(line_bytes_xy_rgb[2], NULL, 0);
+      py=strtoul(line_bytes_xy_rgb[3], NULL, 0);
       faune_xyz.SetMessage("");
+      
+      reader_universe.SetLinesRead(pixel_number);
+      reader_universe.SetBytesRead(strtoul(line_bytes_xy_rgb[1], NULL, 0));
+      delay(300);
     } 
     if (faune_xyz.GetClient().connected()) 
     {
-      while(faune_xyz.GetClient().available()) 
-                            faune_xyz.check_page();
+      while(faune_xyz.GetClient().available()) faune_xyz.check_page();
     }
     else if (millis() - faune_xyz.GetLastAttemptTime() > requestInterval) 
     {
    // if you're not connected, and two minutes have passed since
    // your last connection, then attempt to connect again:
-     faune_xyz.connectToServer();
+     test_connection=faune_xyz.connectToServer();
     }
     /* END FAUNE ONLINE */
-    Serial.println(faune_xyz.GetMessage().length());
-
-
+   
+    //if(faune_xyz.GetMessage().length() == 0 && faune_xyz.GetLecture()==true
+    if(test_connection==false)
+   {
       char xy_RGB[5][64];
       reader_universe.fill_sequence_online(xy_RGB);
 
       px = strtoul(xy_RGB[0], NULL, 0);
       py = strtoul(xy_RGB[1], NULL, 0);
       // Serial.println("It is the constellation named ");
-      String name_const = reader_universe.return_constellation(px, py);
+      
       // strip.setBrightness(30);
   
       color_r=atoi(xy_RGB[2]);
@@ -201,6 +213,7 @@ void loop() {
       lastest_line_bytes[0] = reader_universe.GetLinesRead();
       lastest_line_bytes[1] = reader_universe.GetBytesRead();
 
+      Serial.println(reader_universe.GetBytesRead());
       randnumber = random(2, 12);
       for (int boucle = 0; boucle < 60; boucle++) 
       {
@@ -223,27 +236,31 @@ void loop() {
         }
       }
       pixel_number=reader_universe.GetLinesRead();
-     
-  
-    lcd.setCursor(0, 1);
-    lcd.print("Galactic coordinate");
-    lcd.setCursor(0, 2);
-    lcd.print("x=");
-    lcd.print(reader_universe.GetLongitude(px));
-    lcd.print((char)223);
-    lcd.setCursor(10, 2);
-    lcd.print("y=");
-    lcd.print(reader_universe.GetLatitude(py));
-    lcd.print((char)223);
-    lcd.setCursor(0, 0);
-    lcd.print ("Pixel #");
-    lcd.print (pixel_number);
-    lcd.print ("  ");
-    lcd.setCursor(0, 3);
-    lcd.print(name_const);
-    lcd.print(" ");
+   }
 
-    delay(30);
+      
+    if(px != 0 && py !=0)
+    {
+      name_const = reader_universe.return_constellation(px, py);
+      lcd.setCursor(0, 1);
+      lcd.print("Galactic coordinate");
+      lcd.setCursor(0, 2);
+      lcd.print("x=");
+      lcd.print(reader_universe.GetLongitude(px));
+      lcd.print((char)223);
+      lcd.setCursor(10, 2);
+      lcd.print("y=");
+      lcd.print(reader_universe.GetLatitude(py));
+      lcd.print((char)223);
+      lcd.setCursor(0, 0);
+      lcd.print ("Pixel #");
+      lcd.print (pixel_number);
+      lcd.print ("  ");
+      lcd.setCursor(0, 3);
+      lcd.print(name_const);
+      lcd.print(" ");
+    }
+    delay(3);
 }
 void EEPROMWritelong(int address, long value)
 {

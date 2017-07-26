@@ -60,8 +60,9 @@ void ReachingFaune::check_page()
 SetLecture(lecture);
 }
  
-void ReachingFaune::connectToServer()
+boolean ReachingFaune::connectToServer()
 {
+   boolean bool_value; 
    // attempt to connect, and wait a millisecond:
    Serial.println("connecting to server...");
    if (client.connect(serverName, 80)) 
@@ -71,15 +72,18 @@ void ReachingFaune::connectToServer()
    client.println("GET /update.php HTTP/1.1"); 
    client.println("Host: faune.xyz");
    client.println();
+   bool_value=true;
     }
   else {
     Serial.println("connection failed");
+    bool_value=false;
   }
  // remettre le compteur a zero pour la prochaine connexion:
  //lastAttemptTime = millis();
  SetLastAttemptTime(millis());
+ return bool_value;
 }
-void ReachingFaune::parse_web(char* input_string,char (&line_xy_rgb)[6][64])
+void ReachingFaune::parse_web(char* input_string,char (&line_xy_rgb)[7][64])
 {
   char *token;
   token = strtok(input_string, ",");

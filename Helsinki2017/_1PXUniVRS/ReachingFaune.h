@@ -21,10 +21,10 @@ class ReachingFaune
 	public:
 		ReachingFaune();
 		~ReachingFaune();
-		void connectToServer(); 
+		boolean connectToServer(); 
 		void check_page();
 		
-		void parse_web(char* input_string,char (&line_xy_rgb)[6][64]);
+		void parse_web(char* input_string,char (&line_xy_rgb)[7][64]);
 	
 	private:
 		EthernetClient client;
@@ -44,6 +44,8 @@ class ReachingFaune
 		EthernetClient GetClient(){return client;};
 
 		unsigned long GetLastAttemptTime(){return lastAttemptTime;};
-      void SetLastAttemptTime(unsigned long itslastAttemptTime){lastAttemptTime=itslastAttemptTime;};
+    void SetLastAttemptTime(unsigned long itslastAttemptTime){lastAttemptTime=itslastAttemptTime;};
+
+    String GetServerName() {return String(serverName);};
 };
 #endif
