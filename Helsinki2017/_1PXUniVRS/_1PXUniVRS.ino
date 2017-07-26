@@ -146,9 +146,9 @@ void loop() {
     unsigned long int pixel_number;
     unsigned long int px=0;
     unsigned long int py=0;
-    int color_r;
-    int color_g;
-    int color_b;
+    int color_r=0;
+    int color_g=0;
+    int color_b=0;
     String name_const;
 
     char input_string[256];
@@ -156,7 +156,6 @@ void loop() {
     
 
      /* Faune online stuff */ 
-
     if(faune_xyz.GetMessage().length() > 0 && faune_xyz.GetLecture()==false)
     {
      // Serial.print("I have received this from the server ");
@@ -173,6 +172,13 @@ void loop() {
       px=strtoul(line_bytes_xy_rgb[2], NULL, 0);
       py=strtoul(line_bytes_xy_rgb[3], NULL, 0);
       faune_xyz.SetMessage("");
+      
+      color_r=atoi(line_bytes_xy_rgb[4]);
+      color_g=atoi(line_bytes_xy_rgb[5]);
+      color_b=atoi(line_bytes_xy_rgb[6]);
+      for (int i = 0; i < NUMPIXELS; i++)
+        strip.setPixelColor(i, color_r,color_g,color_b);
+      strip.show();
       
       reader_universe.SetLinesRead(pixel_number);
       reader_universe.SetBytesRead(strtoul(line_bytes_xy_rgb[1], NULL, 0));
@@ -214,13 +220,13 @@ void loop() {
       lastest_line_bytes[1] = reader_universe.GetBytesRead();
 
       Serial.println(reader_universe.GetBytesRead());
-      randnumber = random(2, 12);
+   
       for (int boucle = 0; boucle < 60; boucle++) 
       {
         watchdogValue = analogRead(analogInPin);
         resetValue = digitalRead (resetPin);
 
-        delay (randnumber);
+    
         if (resetValue > 0 ) {
           lastest_line_bytes[0] = 0;
           lastest_line_bytes[1] = 0;
@@ -239,7 +245,7 @@ void loop() {
    }
 
       
-    if(px != 0 && py !=0)
+    if(px != 0 && py !=0) 
     {
       name_const = reader_universe.return_constellation(px, py);
       lcd.setCursor(0, 1);
