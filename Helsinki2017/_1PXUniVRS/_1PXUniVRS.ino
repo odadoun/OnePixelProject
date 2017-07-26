@@ -225,8 +225,7 @@ void loop() {
       {
         watchdogValue = analogRead(analogInPin);
         resetValue = digitalRead (resetPin);
-
-    
+ 
         if (resetValue > 0 ) {
           lastest_line_bytes[0] = 0;
           lastest_line_bytes[1] = 0;
@@ -254,10 +253,12 @@ void loop() {
       lcd.print("x=");
       lcd.print(reader_universe.GetLongitude(px));
       lcd.print((char)223);
+      lcd.print((char)32);
       lcd.setCursor(10, 2);
       lcd.print("y=");
       lcd.print(reader_universe.GetLatitude(py));
       lcd.print((char)223);
+      lcd.print((char)32);
       lcd.setCursor(0, 0);
       lcd.print ("Pixel #");
       lcd.print (pixel_number);
